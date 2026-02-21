@@ -38,7 +38,7 @@ with st.sidebar:
     mode = st.radio(
         "Retrieval strategy",
         options=list(MODES.keys()),
-        index=list(MODES.keys()).index("hybrid"),  # default: hybrid
+        index=list(MODES.keys()).index("local"),  # default: local (faster)
         format_func=lambda m: f"{m.capitalize()} — {MODES[m]}",
     )
     st.divider()

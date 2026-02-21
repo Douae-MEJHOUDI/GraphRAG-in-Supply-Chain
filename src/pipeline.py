@@ -1,7 +1,7 @@
 """
 LightRAG pipeline — initialisation and query helpers.
 
-LLM  : Groq API via OpenAI-compatible endpoint (free, no GPU needed)
+LLM  : Groq API, dual-model routing (see llm_config.py)
 Embed: sentence-transformers all-MiniLM-L6-v2 (local CPU)
 
 Usage:
@@ -16,9 +16,8 @@ import os
 from dotenv import load_dotenv
 from lightrag import LightRAG, QueryParam
 from lightrag.utils import EmbeddingFunc, always_get_an_event_loop
-from lightrag.llm.openai import openai_complete
 
-from src.llm_config import embed_texts
+from src.llm_config import groq_complete, embed_texts
 
 load_dotenv()
 
@@ -42,21 +41,24 @@ def build_rag() -> LightRAG:
     """
     os.makedirs(WORKING_DIR, exist_ok=True)
 
-    groq_api_key = os.getenv("GROQ_API_KEY")
-    if not groq_api_key:
+    if not os.getenv("GROQ_API_KEY"):
         raise EnvironmentError(
             "GROQ_API_KEY not found. Copy .env.example to .env and add your key."
         )
 
     rag = LightRAG(
         working_dir=WORKING_DIR,
-        # LLM: use LightRAG's built-in openai_complete pointed at Groq
-        llm_model_func=openai_complete,
-        llm_model_name="meta-llama/llama-4-scout-17b-16e-instruct",  # supports structured outputs on Groq
-        llm_model_kwargs={
-            "base_url": "https://api.groq.com/openai/v1",
-            "api_key": groq_api_key,
-        },
+        # Custom dual-model function: fast 8b for answers, 17b only for keyword extraction
+        llm_model_func=groq_complete,
+        # Groq free tier has only 6,000 TPM for llama-3.1-8b-instant.
+        # max_async=1 → sequential requests → no rate-limit collisions.
+        llm_model_max_async=1,
+        # Longer timeout so the openai client has time to retry after rate-limit waits
+        # (worker timeout = 2 × this value, so 240 s total before giving up)
+        default_llm_timeout=120,
+        # Smaller chunks → more chunks per document → better retrieval granularity
+        chunk_token_size=400,
+        chunk_overlap_token_size=50,
         # Embeddings: local sentence-transformers (no API call needed)
         embedding_func=EmbeddingFunc(
             embedding_dim=EMBEDDING_DIM,
@@ -93,7 +95,7 @@ def insert_file(rag: LightRAG, filepath: str) -> None:
 # Query helper
 # --------------------------------------------------------------------------- #
 
-def ask(rag: LightRAG, question: str, mode: str = "hybrid") -> str:
+def ask(rag: LightRAG, question: str, mode: str = "local") -> str:
     """
     Query the knowledge graph.
 
