@@ -64,43 +64,98 @@ def _get_spacy() -> spacy.Language:
 
 
 # ---------------------------------------------------------------------------
-# SC-specific NER patterns
-# These supplement spaCy's default NER to catch supply chain entity types
-# that generic models miss (component names, port names, etc.)
+# Canonical entity whitelist
+#
+# These entities have an unambiguous type that must not be overridden by
+# sentence-level signal matching. Without this, a sentence like
+# "TSMC supplies advanced chips..." causes "TSMC" to be typed as PART
+# because "chip" appears in the same sentence.
+#
+# Priority order in _classify_entity_type:
+#   1. This whitelist  (always wins)
+#   2. spaCy label rules (GPE → Region, EVENT → Disruption)
+#   3. Entity-name keyword check  (entity name itself contains "port", etc.)
+#   4. ORG default → Supplier
 # ---------------------------------------------------------------------------
 
-# Keywords that signal each entity type when they appear near an ORG/GPE span
-SC_ENTITY_SIGNALS: dict[EntityType, list[str]] = {
-    EntityType.SUPPLIER:        ["supplier", "vendor", "manufacturer", "produces",
-                                  "makes", "sources from", "procures from"],
-    EntityType.MANUFACTURER:    ["assembles", "manufactures", "factory", "plant",
-                                  "production facility"],
-    EntityType.PORT:            ["port", "harbor", "terminal", "airport hub"],
-    EntityType.REGION:          ["region", "province", "country", "zone", "area"],
-    EntityType.PART:            ["component", "chip", "wafer", "lithium", "battery",
-                                  "module", "sensor", "display", "pcb"],
-    EntityType.DISRUPTION:      ["earthquake", "strike", "flood", "fire", "closure",
-                                  "sanction", "shortage", "disruption", "outage"],
-    EntityType.LOGISTICS_ROUTE: ["route", "lane", "corridor", "shipping line",
-                                  "freight path"],
+CANONICAL_ENTITY_TYPES: dict[str, EntityType] = {
+    # Semiconductor
+    "TSMC":                               EntityType.SUPPLIER,
+    "Taiwan Semiconductor Manufacturing": EntityType.SUPPLIER,
+    "ASML":                               EntityType.SUPPLIER,
+    "GlobalFoundries":                    EntityType.SUPPLIER,
+    "Samsung Foundry":                    EntityType.SUPPLIER,
+    "Samsung":                            EntityType.SUPPLIER,
+    "Intel":                              EntityType.SUPPLIER,
+    # EV / Consumer electronics manufacturers
+    "Tesla":                              EntityType.MANUFACTURER,
+    "Apple":                              EntityType.MANUFACTURER,
+    "BMW":                                EntityType.MANUFACTURER,
+    "Volkswagen":                         EntityType.MANUFACTURER,
+    "Audi":                               EntityType.MANUFACTURER,
+    "Ford":                               EntityType.MANUFACTURER,
+    "Foxconn":                            EntityType.MANUFACTURER,
+    # Battery & component suppliers
+    "CATL":                               EntityType.SUPPLIER,
+    "Panasonic Energy":                   EntityType.SUPPLIER,
+    "Panasonic":                          EntityType.SUPPLIER,
+    "LG Energy":                          EntityType.SUPPLIER,
+    "POSCO":                              EntityType.SUPPLIER,
+    "Glencore":                           EntityType.SUPPLIER,
+    "Ganfeng Lithium":                    EntityType.SUPPLIER,
+    "Pilbara Minerals":                   EntityType.SUPPLIER,
+    # Logistics
+    "Maersk":                             EntityType.SUPPLIER,
+    # Chip / component products (not companies)
+    "AMD":                                EntityType.PART,
+    "NVIDIA":                             EntityType.PART,
 }
 
-# Relation trigger phrases — maps surface patterns to RelationType
+# ---------------------------------------------------------------------------
+# Entity-name keyword sets used in _classify_entity_type
+# These fire on the entity's OWN name, not the surrounding sentence.
+# This correctly types "Port of Shanghai" as Port without contaminating
+# every other entity in the same sentence.
+# ---------------------------------------------------------------------------
+
+_PORT_KEYWORDS       = {"port", "harbor", "harbour", "terminal", "hub"}
+_ROUTE_KEYWORDS      = {"route", "lane", "corridor", "canal", "strait", "passage"}
+_DISRUPTION_KEYWORDS = {
+    "earthquake", "strike", "flood", "fire", "closure", "sanction",
+    "shortage", "disruption", "lockdown", "outage", "explosion",
+    "hurricane", "typhoon", "tsunami", "pandemic",
+}
+
+# Context signals used ONLY to distinguish Manufacturer from generic Supplier
+# for ORG spans not in the whitelist.
+_MANUFACTURER_CONTEXT_SIGNALS = {
+    "assembles", "manufactures", "factory", "plant",
+    "production facility", "makes electric", "designs consumer",
+}
+
+# spaCy labels we accept for entity extraction
+_ACCEPTED_LABELS = {"ORG", "GPE", "FAC", "PRODUCT", "EVENT", "LOC", "NORP"}
+
+
+# ---------------------------------------------------------------------------
+# Relation trigger phrases
+# ---------------------------------------------------------------------------
+
 RELATION_PATTERNS: list[tuple[re.Pattern, RelationType]] = [
-    (re.compile(r"suppl(?:ies|y|ied|ier)", re.I),       RelationType.SUPPLIES),
-    (re.compile(r"source[sd]? from",        re.I),       RelationType.SUPPLIES),
-    (re.compile(r"depend[s]? on",           re.I),       RelationType.DEPENDS_ON),
-    (re.compile(r"require[sd]?",            re.I),       RelationType.DEPENDS_ON),
-    (re.compile(r"ships? through",          re.I),       RelationType.SHIPS_THROUGH),
-    (re.compile(r"routes? through",         re.I),       RelationType.SHIPS_THROUGH),
-    (re.compile(r"located in",              re.I),       RelationType.LOCATED_IN),
-    (re.compile(r"based in",               re.I),       RelationType.LOCATED_IN),
-    (re.compile(r"headquartered in",       re.I),       RelationType.LOCATED_IN),
-    (re.compile(r"affect(?:ed|s)? by",     re.I),       RelationType.AFFECTED_BY),
-    (re.compile(r"impacted by",            re.I),       RelationType.AFFECTED_BY),
-    (re.compile(r"alternative(?:ly)?",     re.I),       RelationType.ALTERNATIVE_TO),
-    (re.compile(r"sell[s]? to",            re.I),       RelationType.SELLS_TO),
-    (re.compile(r"deliver[s]? to",        re.I),       RelationType.SELLS_TO),
+    (re.compile(r"suppl(?:ies|y|ied|ier)", re.I),   RelationType.SUPPLIES),
+    (re.compile(r"source[sd]? from",        re.I),   RelationType.SUPPLIES),
+    (re.compile(r"depend[s]? on",           re.I),   RelationType.DEPENDS_ON),
+    (re.compile(r"require[sd]?",            re.I),   RelationType.DEPENDS_ON),
+    (re.compile(r"ships? through",          re.I),   RelationType.SHIPS_THROUGH),
+    (re.compile(r"routes? through",         re.I),   RelationType.SHIPS_THROUGH),
+    (re.compile(r"located in",              re.I),   RelationType.LOCATED_IN),
+    (re.compile(r"based in",               re.I),   RelationType.LOCATED_IN),
+    (re.compile(r"headquartered in",        re.I),   RelationType.LOCATED_IN),
+    (re.compile(r"affect(?:ed|s)? by",     re.I),   RelationType.AFFECTED_BY),
+    (re.compile(r"impacted by",             re.I),   RelationType.AFFECTED_BY),
+    (re.compile(r"alternative(?:ly)?",     re.I),   RelationType.ALTERNATIVE_TO),
+    (re.compile(r"sell[s]? to",            re.I),   RelationType.SELLS_TO),
+    (re.compile(r"deliver[s]? to",         re.I),   RelationType.SELLS_TO),
 ]
 
 
@@ -140,12 +195,11 @@ class KnowledgeGraphBuilder:
         self.confidence_threshold = confidence_threshold
         self.disambiguator        = EntityDisambiguator()
 
-        # Internal state populated progressively through the pipeline
-        self.documents:  list[dict]    = []   # {"text": ..., "source": ...}
-        self.raw_entities: list[Entity] = []
-        self.canonical_entities: list[Entity] = []
-        self.triples:    list[Triple]  = []
-        self.graph:      nx.DiGraph    = nx.DiGraph()
+        self.documents:           list[dict]   = []
+        self.raw_entities:        list[Entity] = []
+        self.canonical_entities:  list[Entity] = []
+        self.triples:             list[Triple] = []
+        self.graph:               nx.DiGraph   = nx.DiGraph()
 
     # ------------------------------------------------------------------
     # Step 1 — Load documents
@@ -167,7 +221,8 @@ class KnowledgeGraphBuilder:
             if data.is_dir():
                 docs = []
                 for f in sorted(data.glob("*.txt")):
-                    docs.append({"text": f.read_text(encoding="utf-8"), "source": str(f)})
+                    docs.append({"text": f.read_text(encoding="utf-8"),
+                                 "source": str(f)})
                 for f in sorted(data.glob("*.json")):
                     loaded = json.loads(f.read_text(encoding="utf-8"))
                     if isinstance(loaded, list):
@@ -194,8 +249,12 @@ class KnowledgeGraphBuilder:
         """
         Run NER over all documents to find SC-specific entities.
 
-        Uses spaCy for base entity detection (ORG, GPE, FAC, PRODUCT)
-        then applies SC signal keywords to assign a more specific EntityType.
+        Uses spaCy for base entity detection then applies a three-tier
+        classification strategy:
+          1. Canonical whitelist  — known entities always get the right type
+          2. spaCy label rules    — GPE/LOC → Region, EVENT → Disruption
+          3. Entity-name keywords — "Port of X" → Port, regardless of context
+          4. ORG default          — any unmatched ORG → Supplier
 
         Returns self for method chaining.
         """
@@ -208,15 +267,16 @@ class KnowledgeGraphBuilder:
             spacy_doc = nlp(text)
 
             for sent in spacy_doc.sents:
-                sent_text  = sent.text.lower()
-                sent_raw   = sent.text
+                sent_text = sent.text.lower()
+                sent_raw  = sent.text
 
                 for ent in sent.ents:
-                    if ent.label_ not in {"ORG", "GPE", "FAC", "PRODUCT",
-                                          "EVENT", "LOC", "NORP"}:
+                    if ent.label_ not in _ACCEPTED_LABELS:
                         continue
 
-                    etype = self._classify_entity_type(ent.label_, sent_text)
+                    etype = self._classify_entity_type(
+                        ent.label_, sent_text, ent.text
+                    )
                     if etype is None:
                         continue
 
@@ -232,28 +292,56 @@ class KnowledgeGraphBuilder:
         return self
 
     def _classify_entity_type(
-        self, spacy_label: str, context: str
+        self,
+        spacy_label: str,
+        context:     str,   # full sentence, lowercased
+        entity_name: str,   # the entity span text as extracted by spaCy
     ) -> Optional[EntityType]:
         """
-        Map a spaCy label + surrounding sentence context to a SC EntityType.
-        Returns None if no SC-relevant type can be determined.
+        Map a spaCy label + entity name + sentence context to a SC EntityType.
+
+        Priority (first match wins):
+          1. Canonical whitelist   — exact name lookup, always correct
+          2. spaCy label rules     — GPE/LOC/NORP → Region, EVENT → Disruption
+          3. Entity-name keywords  — entity's own text contains "port", "earthquake", etc.
+             Fires on the ENTITY NAME, not the surrounding sentence, which prevents
+             "TSMC" from being typed as PART just because "chip" appears nearby.
+          4. Context signal        — only used to distinguish Manufacturer from
+             Supplier for ORG spans not in the whitelist.
+          5. ORG default           — Supplier (safe fallback for unknown companies)
         """
-        # GPE / LOC / NORP → likely a Region
+        # 1. Canonical whitelist
+        if entity_name in CANONICAL_ENTITY_TYPES:
+            return CANONICAL_ENTITY_TYPES[entity_name]
+
+        # 2. spaCy label rules
         if spacy_label in {"GPE", "LOC", "NORP"}:
             return EntityType.REGION
 
-        # EVENT → DisruptionEvent
         if spacy_label == "EVENT":
             return EntityType.DISRUPTION
 
-        # For ORG / FAC / PRODUCT, use signal keywords in context
-        for etype, signals in SC_ENTITY_SIGNALS.items():
-            if any(sig in context for sig in signals):
-                return etype
+        # 3. Entity-name keyword checks
+        name_lower = entity_name.lower()
 
-        # Default ORG to Supplier (most common SC entity type)
-        if spacy_label == "ORG":
+        if any(kw in name_lower for kw in _DISRUPTION_KEYWORDS):
+            return EntityType.DISRUPTION
+
+        if any(kw in name_lower for kw in _PORT_KEYWORDS):
+            return EntityType.PORT
+
+        if any(kw in name_lower for kw in _ROUTE_KEYWORDS):
+            return EntityType.LOGISTICS_ROUTE
+
+        # 4. Context signal — Manufacturer vs Supplier (ORG only)
+        if spacy_label in {"ORG", "FAC"}:
+            if any(sig in context for sig in _MANUFACTURER_CONTEXT_SIGNALS):
+                return EntityType.MANUFACTURER
             return EntityType.SUPPLIER
+
+        # 5. PRODUCT label → Part
+        if spacy_label == "PRODUCT":
+            return EntityType.PART
 
         return None
 
@@ -282,27 +370,31 @@ class KnowledgeGraphBuilder:
             spacy_doc = nlp(text)
 
             for sent in spacy_doc.sents:
-                sent_ents = [e for e in sent.ents
-                             if e.label_ in {"ORG", "GPE", "FAC", "PRODUCT",
-                                             "EVENT", "LOC", "NORP"}]
+                sent_ents = [
+                    e for e in sent.ents
+                    if e.label_ in _ACCEPTED_LABELS
+                ]
                 if len(sent_ents) < 2:
                     continue
 
                 sent_text = sent.text
 
-                # Try all ordered pairs of entities in the sentence
                 for i, head_ent in enumerate(sent_ents):
-                    for tail_ent in sent_ents[i+1:]:
+                    for tail_ent in sent_ents[i + 1:]:
                         triple = self._match_relation(
                             head_ent.text, tail_ent.text, sent_text
                         )
                         if triple is not None:
                             triples.append(triple)
 
-        # Apply confidence threshold
-        self.triples = [t for t in triples if t.confidence >= self.confidence_threshold]
-        print(f"[Builder] Extracted {len(self.triples)} triples "
-              f"(threshold ≥ {self.confidence_threshold})")
+        self.triples = [
+            t for t in triples
+            if t.confidence >= self.confidence_threshold
+        ]
+        print(
+            f"[Builder] Extracted {len(self.triples)} triples "
+            f"(threshold >= {self.confidence_threshold})"
+        )
         return self
 
     def _match_relation(
@@ -312,33 +404,33 @@ class KnowledgeGraphBuilder:
         Scan the sentence for a relation pattern between head and tail.
         Returns the highest-confidence matching Triple, or None.
         """
-        best_triple    = None
-        best_conf      = 0.0
+        best_triple = None
+        best_conf   = 0.0
 
         for pattern, rel_type in RELATION_PATTERNS:
-            if pattern.search(sentence):
-                # Heuristic confidence: higher if head and tail flank the pattern
-                head_pos = sentence.lower().find(head.lower())
-                tail_pos = sentence.lower().find(tail.lower())
-                match    = pattern.search(sentence)
+            if not pattern.search(sentence):
+                continue
 
-                if head_pos == -1 or tail_pos == -1 or match is None:
-                    continue
+            head_pos = sentence.lower().find(head.lower())
+            tail_pos = sentence.lower().find(tail.lower())
+            match    = pattern.search(sentence)
 
-                # Positional confidence: pattern between head and tail scores higher
-                pat_pos  = match.start()
-                in_order = head_pos < pat_pos < tail_pos
-                conf     = 0.85 if in_order else 0.65
+            if head_pos == -1 or tail_pos == -1 or match is None:
+                continue
 
-                if conf > best_conf:
-                    best_conf   = conf
-                    best_triple = Triple(
-                        head=head,
-                        relation=rel_type,
-                        tail=tail,
-                        confidence=conf,
-                        source_text=sentence,
-                    )
+            pat_pos  = match.start()
+            in_order = head_pos < pat_pos < tail_pos
+            conf     = 0.85 if in_order else 0.65
+
+            if conf > best_conf:
+                best_conf   = conf
+                best_triple = Triple(
+                    head=head,
+                    relation=rel_type,
+                    tail=tail,
+                    confidence=conf,
+                    source_text=sentence,
+                )
 
         return best_triple
 
@@ -353,9 +445,10 @@ class KnowledgeGraphBuilder:
 
         Returns self for method chaining.
         """
-        self.canonical_entities = self.disambiguator.disambiguate(self.raw_entities)
+        self.canonical_entities = self.disambiguator.disambiguate(
+            self.raw_entities
+        )
 
-        # Rewrite triple head/tail to canonical names
         updated_triples = []
         for t in self.triples:
             canon_head = self.disambiguator.resolve(t.head)
@@ -370,9 +463,11 @@ class KnowledgeGraphBuilder:
                 ))
 
         self.triples = updated_triples
-        print(f"[Builder] After disambiguation: "
-              f"{len(self.canonical_entities)} canonical entities, "
-              f"{len(self.triples)} triples")
+        print(
+            f"[Builder] After disambiguation: "
+            f"{len(self.canonical_entities)} canonical entities, "
+            f"{len(self.triples)} triples"
+        )
         return self
 
     # ------------------------------------------------------------------
@@ -386,6 +481,10 @@ class KnowledgeGraphBuilder:
         Node attributes: entity_type, aliases, metadata
         Edge attributes: relation, weight (default 1.0), confidence, source_text
 
+        For any node that appears in a triple but was not in the canonical
+        entity list, the type is inferred from the whitelist first, then
+        defaults to Supplier.
+
         Returns
         -------
         nx.DiGraph
@@ -393,37 +492,32 @@ class KnowledgeGraphBuilder:
         """
         G = nx.DiGraph()
 
-        # Add nodes from canonical entity list
         entity_map = {e.name: e for e in self.canonical_entities}
         for name, ent in entity_map.items():
             G.add_node(name, **{
-                NODE_ATTR_TYPE:    ent.entity_type.value,
-                NODE_ATTR_ALIASES: ent.aliases,
+                NODE_ATTR_TYPE:     ent.entity_type.value,
+                NODE_ATTR_ALIASES:  ent.aliases,
                 NODE_ATTR_METADATA: ent.metadata,
             })
 
-        # Add edges from triples
         for triple in self.triples:
-            # Ensure both endpoints exist as nodes (they may appear only in triples)
-            if triple.head not in G:
-                G.add_node(triple.head, **{
-                    NODE_ATTR_TYPE: EntityType.SUPPLIER.value,
-                    NODE_ATTR_ALIASES: [],
-                    NODE_ATTR_METADATA: {},
-                })
-            if triple.tail not in G:
-                G.add_node(triple.tail, **{
-                    NODE_ATTR_TYPE: EntityType.SUPPLIER.value,
-                    NODE_ATTR_ALIASES: [],
-                    NODE_ATTR_METADATA: {},
-                })
+            for node_name in (triple.head, triple.tail):
+                if node_name not in G:
+                    fallback_type = CANONICAL_ENTITY_TYPES.get(
+                        node_name, EntityType.SUPPLIER
+                    )
+                    G.add_node(node_name, **{
+                        NODE_ATTR_TYPE:     fallback_type.value,
+                        NODE_ATTR_ALIASES:  [],
+                        NODE_ATTR_METADATA: {},
+                    })
 
             G.add_edge(
                 triple.head,
                 triple.tail,
                 **{
                     EDGE_ATTR_RELATION: triple.relation.value,
-                    EDGE_ATTR_WEIGHT:   1.0,        # overwritten in Step 6
+                    EDGE_ATTR_WEIGHT:   1.0,
                     EDGE_ATTR_CONF:     triple.confidence,
                     EDGE_ATTR_SOURCE:   triple.source_text or "",
                 }
@@ -445,14 +539,14 @@ class KnowledgeGraphBuilder:
         Assign criticality-aware weights to all graph edges.
 
         Logic:
-        - Base weight = 1.0 for all edges
-        - Supply edges (SUPPLIES, DEPENDS_ON) from a node with NO alternative
-          supplier get a higher weight → they are more critical in disruption
-          propagation.
-        - ALTERNATIVE_TO edges get weight 0 (they reduce, not increase, risk)
+        - ALTERNATIVE_TO edges → weight 0.0 (risk mitigators, not carriers)
+        - SUPPLIES / DEPENDS_ON edges → weight = 1 / (1 + n_alternatives)
+          A node with no alternatives gets weight ~1.0 (critical single source).
+          A node with 3 alternatives gets weight ~0.25 (redundant supply).
+        - All other edges → weight 1.0 (default)
 
-        This makes the disruption propagation in Module 3 supply-chain-aware:
-        single-source dependencies propagate more strongly than redundant ones.
+        This makes Module 3's disruption propagation supply-chain-aware:
+        shocks travel harder along single-source dependency edges.
 
         Returns self for method chaining.
         """
@@ -462,18 +556,19 @@ class KnowledgeGraphBuilder:
             relation = data.get(EDGE_ATTR_RELATION, "")
 
             if relation == RelationType.ALTERNATIVE_TO.value:
-                # Alternative edges reduce disruption impact — weight 0 for propagation
                 G[u][v][EDGE_ATTR_WEIGHT] = 0.0
                 continue
 
-            if relation in {RelationType.SUPPLIES.value, RelationType.DEPENDS_ON.value}:
-                # Count how many alternative suppliers exist for the head node
+            if relation in {
+                RelationType.SUPPLIES.value,
+                RelationType.DEPENDS_ON.value,
+            }:
                 alternatives = [
                     nbr for nbr in G.neighbors(u)
-                    if G[u][nbr].get(EDGE_ATTR_RELATION) == RelationType.ALTERNATIVE_TO.value
+                    if G[u][nbr].get(EDGE_ATTR_RELATION)
+                    == RelationType.ALTERNATIVE_TO.value
                 ]
                 n_alternatives = len(alternatives)
-                # Higher criticality (weight closer to 1.0) when fewer alternatives exist
                 criticality = 1.0 / (1.0 + n_alternatives)
                 G[u][v][EDGE_ATTR_WEIGHT] = round(criticality, 3)
 
@@ -574,13 +669,13 @@ class KnowledgeGraphBuilder:
             rel_counts[rel] = rel_counts.get(rel, 0) + 1
 
         return {
-            "nodes":           G.number_of_nodes(),
-            "edges":           G.number_of_edges(),
-            "node_types":      type_counts,
-            "relation_types":  rel_counts,
-            "avg_out_degree":  round(
+            "nodes":                       G.number_of_nodes(),
+            "edges":                       G.number_of_edges(),
+            "node_types":                  type_counts,
+            "relation_types":              rel_counts,
+            "avg_out_degree":              round(
                 sum(d for _, d in G.out_degree()) / G.number_of_nodes(), 2
             ),
-            "is_weakly_connected": nx.is_weakly_connected(G),
+            "is_weakly_connected":         nx.is_weakly_connected(G),
             "weakly_connected_components": nx.number_weakly_connected_components(G),
         }

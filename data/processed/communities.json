@@ -1,66 +1,71 @@
 [
   {
-    "community_id": 7,
-    "nodes": [
-      "Panasonic",
-      "Tesla",
-      "CATL",
-      "the Democratic Republic of Congo",
-      "Gigafactory Nevada",
-      "Japan",
-      "Panasonic Energy",
-      "Volkswagen",
-      "LG Energy",
-      "BMW"
-    ],
-    "summary": "A part cluster of 10 supply chain entities. Central hub: Tesla. Primary relationship types: depends_on, located_in, supplies. Contains 15 internal connections.",
-    "dominant_type": "Part",
-    "size": 10,
-    "internal_edges": 15
-  },
-  {
-    "community_id": 20,
-    "nodes": [
-      "Apple",
-      "Foxconn",
-      "Taiwan",
-      "NVIDIA",
-      "AMD",
-      "iPhones"
-    ],
-    "summary": "A manufacturer cluster of 6 supply chain entities. Central hub: Apple. Primary relationship types: located_in, supplies. Contains 9 internal connections.",
-    "dominant_type": "Manufacturer",
-    "size": 6,
-    "internal_edges": 9
-  },
-  {
     "community_id": 5,
     "nodes": [
-      "TSMC",
-      "the Taiwan Earthquake",
-      "the United States",
-      "Europe",
-      "GlobalFoundries",
-      "the Port of Kaohsiung"
-    ],
-    "summary": "A region cluster of 6 supply chain entities. Central hub: TSMC. Primary relationship types: affected_by, alternative_to, located_in, ships_through. Contains 10 internal connections.",
-    "dominant_type": "Region",
-    "size": 6,
-    "internal_edges": 10
-  },
-  {
-    "community_id": 16,
-    "nodes": [
+      "Panasonic",
+      "CATL",
+      "the Democratic Republic of Congo",
       "European",
       "Jiangxi",
       "China",
       "the Port of Shanghai",
-      "The Shanghai Lockdown"
+      "The Shanghai Lockdown",
+      "Port of Shanghai",
+      "Ganfeng Lithium"
     ],
-    "summary": "A region cluster of 5 supply chain entities. Central hub: China. Primary relationship types: affected_by, alternative_to, located_in, ships_through. Contains 5 internal connections.",
+    "summary": "A region cluster of 10 supply chain entities. Central hub: China. Primary relationship types: affected_by, alternative_to, located_in, ships_through, supplies. Contains 12 internal connections.",
     "dominant_type": "Region",
-    "size": 5,
-    "internal_edges": 5
+    "size": 10,
+    "internal_edges": 12
+  },
+  {
+    "community_id": 2,
+    "nodes": [
+      "Panasonic Energy",
+      "LG Energy",
+      "Gigafactory Nevada",
+      "Japan",
+      "Volkswagen",
+      "Tesla",
+      "BMW",
+      "Glencore"
+    ],
+    "summary": "A supplier cluster of 8 supply chain entities. Central hub: Tesla. Primary relationship types: depends_on, located_in, supplies. Contains 12 internal connections.",
+    "dominant_type": "Supplier",
+    "size": 8,
+    "internal_edges": 12
+  },
+  {
+    "community_id": 7,
+    "nodes": [
+      "TSMC",
+      "the Taiwan Earthquake",
+      "Taiwan",
+      "Foxconn",
+      "iPhones",
+      "Apple",
+      "NVIDIA",
+      "AMD"
+    ],
+    "summary": "A manufacturer cluster of 8 supply chain entities. Central hub: Apple. Primary relationship types: affected_by, depends_on, located_in, supplies. Contains 15 internal connections.",
+    "dominant_type": "Manufacturer",
+    "size": 8,
+    "internal_edges": 15
+  },
+  {
+    "community_id": 19,
+    "nodes": [
+      "GlobalFoundries",
+      "the United States",
+      "Europe",
+      "the Port of Kaohsiung",
+      "Port of Rotterdam",
+      "Maersk"
+    ],
+    "summary": "A region cluster of 6 supply chain entities. Central hub: Europe. Primary relationship types: connects, located_in, ships_through. Contains 7 internal connections.",
+    "dominant_type": "Region",
+    "size": 6,
+    "internal_edges": 7
   },
   {
     "community_id": 0,
@@ -75,23 +80,23 @@
     "internal_edges": 2
   },
   {
-    "community_id": 13,
+    "community_id": 3,
+    "nodes": [
+      "Pilbara Minerals",
+      "Australia"
+    ],
+    "summary": "A supplier cluster of 2 supply chain entities. Central hub: Pilbara Minerals. Primary relationship types: located_in. Contains 1 internal connections.",
+    "dominant_type": "Supplier",
+    "size": 2,
+    "internal_edges": 1
+  },
+  {
+    "community_id": 15,
     "nodes": [
       "Argentina",
       "Chile"
     ],
     "summary": "A region cluster of 2 supply chain entities. Central hub: Argentina. Primary relationship types: supplies. Contains 1 internal connections.",
-    "dominant_type": "Region",
-    "size": 2,
-    "internal_edges": 1
-  },
-  {
-    "community_id": 14,
-    "nodes": [
-      "Australia",
-      "Pilbara Minerals"
-    ],
-    "summary": "A region cluster of 2 supply chain entities. Central hub: Australia. Primary relationship types: located_in. Contains 1 internal connections.",
     "dominant_type": "Region",
     "size": 2,
     "internal_edges": 1
@@ -108,7 +113,7 @@
     "internal_edges": 1
   },
   {
-    "community_id": 23,
+    "community_id": 6,
     "nodes": [
       "The Port of Rotterdam",
       "The Red Sea Shipping Disruption"

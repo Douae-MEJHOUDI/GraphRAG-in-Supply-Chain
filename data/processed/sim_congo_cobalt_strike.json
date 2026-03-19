@@ -1,0 +1,125 @@
+{
+  "event_name": "Congo Cobalt Strike",
+  "event_category": "Industrial",
+  "initial_shock": 0.6,
+  "stats": {
+    "total_affected": 21,
+    "mean_score": 0.1598,
+    "max_score": 0.6,
+    "min_score": 0.0389,
+    "max_hop_reached": 4,
+    "critical_count": 0,
+    "high_count": 1,
+    "moderate_count": 2,
+    "low_count": 18,
+    "event_category": "Industrial",
+    "initial_shock": 0.6
+  },
+  "top_10_exposed": [
+    [
+      "Glencore",
+      0.6
+    ],
+    [
+      "CATL",
+      0.36
+    ],
+    [
+      "Panasonic Energy",
+      0.36
+    ],
+    [
+      "Panasonic",
+      0.216
+    ],
+    [
+      "Tesla",
+      0.216
+    ],
+    [
+      "Gigafactory Nevada",
+      0.216
+    ],
+    [
+      "Port of Shanghai",
+      0.1512
+    ],
+    [
+      "the Democratic Republic of Congo",
+      0.1296
+    ],
+    [
+      "BMW",
+      0.1296
+    ],
+    [
+      "Volkswagen",
+      0.1296
+    ]
+  ],
+  "critical_nodes": [],
+  "high_nodes": [
+    "Glencore"
+  ],
+  "tiers": {
+    "Critical": [],
+    "High": [
+      "Glencore"
+    ],
+    "Moderate": [
+      "CATL",
+      "Panasonic Energy"
+    ],
+    "Low": [
+      "Panasonic",
+      "Tesla",
+      "Gigafactory Nevada",
+      "Port of Shanghai",
+      "the Democratic Republic of Congo",
+      "BMW",
+      "Volkswagen",
+      "LG Energy",
+      "TSMC",
+      "Japan",
+      "Apple",
+      "NVIDIA",
+      "AMD",
+      "the Port of Kaohsiung",
+      "the United States",
+      "Europe",
+      "China",
+      "Taiwan"
+    ]
+  },
+  "merged_scores": {
+    "China": 0.0227,
+    "GlobalFoundries": 0.1278,
+    "BMW": 0.0648,
+    "NVIDIA": 0.1248,
+    "the United States": 0.199,
+    "CATL": 0.2804,
+    "ASML": 0.1609,
+    "The Congo Cobalt Strike": 0.2082,
+    "LG Energy": 0.0648,
+    "Glencore": 0.3,
+    "AMD": 0.1248,
+    "South Korea": 0.0823,
+    "Taiwan": 0.109,
+    "Netherlands": 0.0786,
+    "Panasonic Energy": 0.18,
+    "Panasonic": 0.2689,
+    "Apple": 0.1466,
+    "Japan": 0.054,
+    "TSMC": 0.2657,
+    "Volkswagen": 0.0648,
+    "Gigafactory Nevada": 0.108,
+    "Europe": 0.1204,
+    "the Taiwan Earthquake": 0.0786,
+    "Taiwan Semiconductor Manufacturing": 0.1133,
+    "the Katanga Mining Complex": 0.1174,
+    "Port of Shanghai": 0.0756,
+    "Tesla": 0.2193,
+    "the Democratic Republic of Congo": 0.1867,
+    "the Port of Kaohsiung": 0.1131
+  }
+}

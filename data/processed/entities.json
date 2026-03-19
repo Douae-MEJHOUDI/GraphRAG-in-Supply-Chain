@@ -9,28 +9,22 @@
     }
   },
   {
-    "name": "the Shanghai Lockdown",
-    "entity_type": "Port",
-    "aliases": [],
-    "metadata": {
-      "spacy_label": "ORG",
-      "source": "disruption_report_shanghai_lockdown"
-    }
-  },
-  {
-    "name": "Panasonic",
-    "entity_type": "Part",
-    "aliases": [],
-    "metadata": {
-      "spacy_label": "ORG",
-      "source": "supplier_profile_panasonic"
-    }
-  },
-  {
-    "name": "Tesla",
-    "entity_type": "Manufacturer",
+    "name": "the Katanga Mining Complex",
+    "entity_type": "Supplier",
     "aliases": [
-      "Tesla"
+      "the Katanga Mining Complex"
+    ],
+    "metadata": {
+      "spacy_label": "FAC",
+      "source": "commodity_report_cobalt"
+    }
+  },
+  {
+    "name": "Panasonic Energy",
+    "entity_type": "Supplier",
+    "aliases": [
+      "Panasonic Energy",
+      "Panasonic Energy"
     ],
     "metadata": {
       "spacy_label": "ORG",
@@ -38,21 +32,59 @@
     }
   },
   {
-    "name": "Apple",
-    "entity_type": "Manufacturer",
+    "name": "Pilbara Minerals",
+    "entity_type": "Supplier",
     "aliases": [],
     "metadata": {
       "spacy_label": "ORG",
-      "source": "oem_profile_apple"
+      "source": "commodity_report_lithium"
     }
   },
   {
-    "name": "TSMC",
-    "entity_type": "DisruptionEvent",
+    "name": "GlobalFoundries",
+    "entity_type": "Supplier",
     "aliases": [],
     "metadata": {
       "spacy_label": "ORG",
       "source": "risk_report_taiwan_semiconductor"
+    }
+  },
+  {
+    "name": "Panasonic",
+    "entity_type": "Supplier",
+    "aliases": [
+      "Panasonic",
+      "Panasonic"
+    ],
+    "metadata": {
+      "spacy_label": "ORG",
+      "source": "supplier_profile_panasonic"
+    }
+  },
+  {
+    "name": "LG Energy",
+    "entity_type": "Supplier",
+    "aliases": [],
+    "metadata": {
+      "spacy_label": "ORG",
+      "source": "commodity_report_lithium"
+    }
+  },
+  {
+    "name": "TSMC",
+    "entity_type": "Supplier",
+    "aliases": [
+      "TSMC",
+      "TSMC",
+      "TSMC",
+      "TSMC",
+      "TSMC",
+      "TSMC",
+      "TSMC"
+    ],
+    "metadata": {
+      "spacy_label": "ORG",
+      "source": "supplier_profile_tsmc"
     }
   },
   {
@@ -68,8 +100,9 @@
   },
   {
     "name": "CATL",
-    "entity_type": "Part",
+    "entity_type": "Supplier",
     "aliases": [
+      "CATL",
       "CATL"
     ],
     "metadata": {
@@ -220,15 +253,6 @@
     }
   },
   {
-    "name": "Foxconn",
-    "entity_type": "Region",
-    "aliases": [],
-    "metadata": {
-      "spacy_label": "GPE",
-      "source": "oem_profile_apple"
-    }
-  },
-  {
     "name": "Denmark",
     "entity_type": "Region",
     "aliases": [],
@@ -314,37 +338,8 @@
     }
   },
   {
-    "name": "Pilbara Minerals",
-    "entity_type": "Part",
-    "aliases": [],
-    "metadata": {
-      "spacy_label": "ORG",
-      "source": "commodity_report_lithium"
-    }
-  },
-  {
-    "name": "Panasonic Energy",
-    "entity_type": "Manufacturer",
-    "aliases": [
-      "Panasonic Energy"
-    ],
-    "metadata": {
-      "spacy_label": "ORG",
-      "source": "supplier_profile_panasonic"
-    }
-  },
-  {
-    "name": "GlobalFoundries",
-    "entity_type": "Part",
-    "aliases": [],
-    "metadata": {
-      "spacy_label": "ORG",
-      "source": "risk_report_taiwan_semiconductor"
-    }
-  },
-  {
     "name": "Volkswagen",
-    "entity_type": "Part",
+    "entity_type": "Manufacturer",
     "aliases": [],
     "metadata": {
       "spacy_label": "ORG",
@@ -352,12 +347,64 @@
     }
   },
   {
-    "name": "LG Energy",
-    "entity_type": "Part",
+    "name": "Foxconn",
+    "entity_type": "Manufacturer",
+    "aliases": [],
+    "metadata": {
+      "spacy_label": "GPE",
+      "source": "oem_profile_apple"
+    }
+  },
+  {
+    "name": "iPhones",
+    "entity_type": "Manufacturer",
     "aliases": [],
     "metadata": {
       "spacy_label": "ORG",
-      "source": "commodity_report_lithium"
+      "source": "oem_profile_apple"
+    }
+  },
+  {
+    "name": "Apple",
+    "entity_type": "Manufacturer",
+    "aliases": [
+      "Apple",
+      "Apple",
+      "Apple",
+      "Apple",
+      "Apple"
+    ],
+    "metadata": {
+      "spacy_label": "ORG",
+      "source": "supplier_profile_tsmc"
+    }
+  },
+  {
+    "name": "Tesla",
+    "entity_type": "Manufacturer",
+    "aliases": [
+      "Tesla",
+      "Tesla",
+      "Tesla",
+      "Tesla",
+      "Tesla",
+      "Tesla",
+      "Tesla"
+    ],
+    "metadata": {
+      "spacy_label": "ORG",
+      "source": "supplier_profile_catl"
+    }
+  },
+  {
+    "name": "BMW",
+    "entity_type": "Manufacturer",
+    "aliases": [
+      "BMW"
+    ],
+    "metadata": {
+      "spacy_label": "ORG",
+      "source": "supplier_profile_catl"
     }
   },
   {
@@ -379,26 +426,6 @@
     }
   },
   {
-    "name": "BMW",
-    "entity_type": "Part",
-    "aliases": [
-      "BMW"
-    ],
-    "metadata": {
-      "spacy_label": "ORG",
-      "source": "supplier_profile_catl"
-    }
-  },
-  {
-    "name": "the Red Sea Shipping Disruption",
-    "entity_type": "Port",
-    "aliases": [],
-    "metadata": {
-      "spacy_label": "ORG",
-      "source": "logistics_report_suez"
-    }
-  },
-  {
     "name": "the Port of Los Angeles",
     "entity_type": "Port",
     "aliases": [
@@ -407,15 +434,6 @@
     "metadata": {
       "spacy_label": "FAC",
       "source": "oem_profile_tesla"
-    }
-  },
-  {
-    "name": "the Suez Canal Corridor",
-    "entity_type": "LogisticsRoute",
-    "aliases": [],
-    "metadata": {
-      "spacy_label": "FAC",
-      "source": "logistics_report_suez"
     }
   },
   {
@@ -471,20 +489,12 @@
     "name": "The Red Sea Shipping Disruption",
     "entity_type": "DisruptionEvent",
     "aliases": [
+      "the Red Sea Shipping Disruption",
       "the Red Sea Shipping Disruption"
     ],
     "metadata": {
       "spacy_label": "ORG",
       "source": "logistics_report_suez"
-    }
-  },
-  {
-    "name": "the Katanga Mining Complex",
-    "entity_type": "DisruptionEvent",
-    "aliases": [],
-    "metadata": {
-      "spacy_label": "FAC",
-      "source": "commodity_report_cobalt"
     }
   },
   {
@@ -501,19 +511,24 @@
   {
     "name": "The Shanghai Lockdown",
     "entity_type": "DisruptionEvent",
-    "aliases": [],
+    "aliases": [
+      "the Shanghai Lockdown",
+      "the Shanghai Lockdown"
+    ],
     "metadata": {
       "spacy_label": "ORG",
       "source": "disruption_report_shanghai_lockdown"
     }
   },
   {
-    "name": "iPhones",
-    "entity_type": "Manufacturer",
-    "aliases": [],
+    "name": "the Suez Canal Corridor",
+    "entity_type": "LogisticsRoute",
+    "aliases": [
+      "the Suez Canal Corridor"
+    ],
     "metadata": {
-      "spacy_label": "ORG",
-      "source": "oem_profile_apple"
+      "spacy_label": "FAC",
+      "source": "logistics_report_suez"
     }
   }
 ]

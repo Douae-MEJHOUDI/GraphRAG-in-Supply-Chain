@@ -1,0 +1,119 @@
+{
+  "event_name": "Shanghai Port Closure",
+  "event_category": "Logistics",
+  "initial_shock": 0.9,
+  "stats": {
+    "total_affected": 12,
+    "mean_score": 0.1534,
+    "max_score": 0.9,
+    "min_score": 0.035,
+    "max_hop_reached": 5,
+    "critical_count": 1,
+    "high_count": 0,
+    "moderate_count": 1,
+    "low_count": 10,
+    "event_category": "Logistics",
+    "initial_shock": 0.9
+  },
+  "top_10_exposed": [
+    [
+      "Port of Shanghai",
+      0.9
+    ],
+    [
+      "China",
+      0.27
+    ],
+    [
+      "CATL",
+      0.162
+    ],
+    [
+      "Panasonic",
+      0.0972
+    ],
+    [
+      "Panasonic Energy",
+      0.0972
+    ],
+    [
+      "the Democratic Republic of Congo",
+      0.05832
+    ],
+    [
+      "Tesla",
+      0.05832
+    ],
+    [
+      "Gigafactory Nevada",
+      0.05832
+    ],
+    [
+      "BMW",
+      0.034991999999999995
+    ],
+    [
+      "Volkswagen",
+      0.034991999999999995
+    ]
+  ],
+  "critical_nodes": [
+    "Port of Shanghai"
+  ],
+  "high_nodes": [],
+  "tiers": {
+    "Critical": [
+      "Port of Shanghai"
+    ],
+    "High": [],
+    "Moderate": [
+      "China"
+    ],
+    "Low": [
+      "CATL",
+      "Panasonic",
+      "Panasonic Energy",
+      "the Democratic Republic of Congo",
+      "Tesla",
+      "Gigafactory Nevada",
+      "BMW",
+      "Volkswagen",
+      "LG Energy",
+      "TSMC"
+    ]
+  },
+  "merged_scores": {
+    "China": 0.3105,
+    "Denmark": 0.0786,
+    "BMW": 0.0175,
+    "NVIDIA": 0.0859,
+    "Foxconn": 0.0859,
+    "The Port of Rotterdam": 0.1537,
+    "the United States": 0.0968,
+    "CATL": 0.2565,
+    "Asian": 0.1573,
+    "the Port of Shanghai": 0.2197,
+    "the Suez Canal Corridor": 0.1609,
+    "LG Energy": 0.0175,
+    "The Red Sea Shipping Disruption": 0.1361,
+    "Glencore": 0.0823,
+    "AMD": 0.0859,
+    "The Port of Singapore": 0.1363,
+    "Taiwan": 0.0896,
+    "Panasonic Energy": 0.1454,
+    "Panasonic": 0.1345,
+    "Apple": 0.1827,
+    "The Shanghai Lockdown": 0.185,
+    "Jiangxi": 0.0786,
+    "TSMC": 0.1434,
+    "Volkswagen": 0.0175,
+    "Gigafactory Nevada": 0.0292,
+    "Port of Shanghai": 0.6494,
+    "Ganfeng Lithium": 0.0859,
+    "Tesla": 0.1405,
+    "The Port of Ningbo": 0.1573,
+    "iPhones": 0.0859,
+    "European": 0.1537,
+    "the Democratic Republic of Congo": 0.0292
+  }
+}

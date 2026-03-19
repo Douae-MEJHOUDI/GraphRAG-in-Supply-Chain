@@ -1,0 +1,80 @@
+{
+  "event_name": "Red Sea Shipping Disruption",
+  "event_category": "Geopolitical",
+  "initial_shock": 0.55,
+  "stats": {
+    "total_affected": 3,
+    "mean_score": 0.4437,
+    "max_score": 0.55,
+    "min_score": 0.231,
+    "max_hop_reached": 1,
+    "critical_count": 0,
+    "high_count": 2,
+    "moderate_count": 0,
+    "low_count": 1,
+    "event_category": "Geopolitical",
+    "initial_shock": 0.55
+  },
+  "top_10_exposed": [
+    [
+      "Maersk",
+      0.55
+    ],
+    [
+      "Port of Rotterdam",
+      0.55
+    ],
+    [
+      "Europe",
+      0.23099999999999998
+    ]
+  ],
+  "critical_nodes": [],
+  "high_nodes": [
+    "Maersk",
+    "Port of Rotterdam"
+  ],
+  "tiers": {
+    "Critical": [],
+    "High": [
+      "Maersk",
+      "Port of Rotterdam"
+    ],
+    "Moderate": [],
+    "Low": [
+      "Europe"
+    ]
+  },
+  "merged_scores": {
+    "AMD": 0.0859,
+    "Maersk": 0.275,
+    "China": 0.1754,
+    "The Port of Singapore": 0.1573,
+    "South Korea": 0.0823,
+    "Denmark": 0.1537,
+    "GlobalFoundries": 0.1352,
+    "Taiwan": 0.0896,
+    "NVIDIA": 0.0859,
+    "Apple": 0.1077,
+    "The Shanghai Lockdown": 0.1176,
+    "The Port of Rotterdam": 0.1034,
+    "TSMC": 0.2009,
+    "Jiangxi": 0.0786,
+    "the United States": 0.1718,
+    "Europe": 0.2087,
+    "the Taiwan Earthquake": 0.0786,
+    "CATL": 0.1004,
+    "ASML": 0.0859,
+    "Asian": 0.1573,
+    "Port of Shanghai": 0.0859,
+    "the Port of Shanghai": 0.1646,
+    "Ganfeng Lithium": 0.0859,
+    "the Suez Canal Corridor": 0.1663,
+    "Tesla": 0.1114,
+    "The Port of Ningbo": 0.0823,
+    "European": 0.0786,
+    "Port of Rotterdam": 0.275,
+    "the Port of Kaohsiung": 0.0859,
+    "The Red Sea Shipping Disruption": 0.2455
+  }
+}

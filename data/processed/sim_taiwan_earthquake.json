@@ -1,0 +1,121 @@
+{
+  "event_name": "Taiwan Earthquake 2024",
+  "event_category": "Natural disaster",
+  "initial_shock": 0.85,
+  "stats": {
+    "total_affected": 13,
+    "mean_score": 0.4402,
+    "max_score": 0.85,
+    "min_score": 0.0386,
+    "max_hop_reached": 4,
+    "critical_count": 3,
+    "high_count": 3,
+    "moderate_count": 4,
+    "low_count": 3,
+    "event_category": "Natural disaster",
+    "initial_shock": 0.85
+  },
+  "top_10_exposed": [
+    [
+      "TSMC",
+      0.85
+    ],
+    [
+      "Taiwan",
+      0.85
+    ],
+    [
+      "Foxconn",
+      0.85
+    ],
+    [
+      "Apple",
+      0.51
+    ],
+    [
+      "NVIDIA",
+      0.51
+    ],
+    [
+      "AMD",
+      0.51
+    ],
+    [
+      "the Port of Kaohsiung",
+      0.357
+    ],
+    [
+      "the United States",
+      0.357
+    ],
+    [
+      "Europe",
+      0.357
+    ],
+    [
+      "iPhones",
+      0.255
+    ]
+  ],
+  "critical_nodes": [
+    "TSMC",
+    "Taiwan",
+    "Foxconn"
+  ],
+  "high_nodes": [
+    "Apple",
+    "NVIDIA",
+    "AMD"
+  ],
+  "tiers": {
+    "Critical": [
+      "TSMC",
+      "Taiwan",
+      "Foxconn"
+    ],
+    "High": [
+      "Apple",
+      "NVIDIA",
+      "AMD"
+    ],
+    "Moderate": [
+      "the Port of Kaohsiung",
+      "the United States",
+      "Europe",
+      "iPhones"
+    ],
+    "Low": [
+      "Port of Shanghai",
+      "China",
+      "CATL"
+    ]
+  },
+  "merged_scores": {
+    "China": 0.2076,
+    "GlobalFoundries": 0.1188,
+    "NVIDIA": 0.3409,
+    "Foxconn": 0.5859,
+    "the United States": 0.3503,
+    "CATL": 0.1197,
+    "ASML": 0.1609,
+    "the Port of Shanghai": 0.1646,
+    "AMD": 0.3409,
+    "South Korea": 0.0823,
+    "Taiwan": 0.5664,
+    "Netherlands": 0.0786,
+    "Apple": 0.4377,
+    "The Shanghai Lockdown": 0.1384,
+    "TSMC": 0.6259,
+    "Jiangxi": 0.0786,
+    "Europe": 0.2717,
+    "Taiwan Semiconductor Manufacturing": 0.1424,
+    "the Taiwan Earthquake": 0.2028,
+    "Port of Shanghai": 0.193,
+    "Ganfeng Lithium": 0.0859,
+    "Tesla": 0.1114,
+    "The Port of Ningbo": 0.0823,
+    "iPhones": 0.2884,
+    "European": 0.0786,
+    "the Port of Kaohsiung": 0.2644
+  }
+}
