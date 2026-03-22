@@ -34,8 +34,20 @@ guides.txt
 # ── Misc ─────────────────────────────────────────────────────────────────────
 *.log
 
+# ── Local large data ─────────────────────────────────────────────────────────
+data/Edgar/
+data/sp500/
+data/interim/
+data/raw/*.jsonl
+data/raw/*.parquet
+
 # My Branch LOL
 
 OLD/
 # Secondary folder
 files/
+
+data/Edgar/
+data/sp500/
+data/raw/*.jsonl
+data/raw/*.parquet

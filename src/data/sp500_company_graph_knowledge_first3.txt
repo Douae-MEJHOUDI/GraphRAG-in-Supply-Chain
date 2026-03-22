@@ -1,0 +1,590 @@
+===== RECORD 1 =====
+Company: Agilent Technologies
+Ticker: A
+Sector: Health Care
+Industry: Life Sciences Tools & Services
+Transcript Count: 44
+Filtered Turn Count: 694
+Matched Keywords: bottleneck, capacity, capacity constraint, capacity constraints, delay, delays, depend on, depends on, distribution, facilities, facility, factories, factory, freight, inventory, logistics, manufacturing, manufacturing capacity, network, operational, operations, plant, plants, procurement, produced, producing, production, raw material, raw materials, rely on, shipment, shipments, shipping, supplier, suppliers, supply chain
+
+Sullivan: In the applied markets Food Testing was up 10% with globalization of the food supply and brand protection continuing to drive strong demand. Agilent will supply GC/MS technology for online air monitoring systems, related to ozone and other air pollution – airborne pollutants.
+
+Mullen: The order fulfillment transformation program is still centered on what you saw at the March Analyst Meeting last year, where Henrik is driving overall consolidation of manufacturing sites and more importantly a drive towards lower cost of our supply chain, as we have moved our manufacturing into low-cost parts of the world, such as Penang, Malaysia where the next phase of that program is to start to move our material supply chain, which as you know, represents actually a higher element of cost of the manufacture products.
+
+Mullen: And that’s why I pointed to three aspects of the programs under operating margin, the supply chain transformation which you’re referring to, the portfolio transformation and then our rationalization and leverage of SG&A and R&D investments.
+
+Mullen: We talked earlier about the new products coming out and as well as our supply chain transformation.
+
+Mullen: Growth was strong across consumable supplies, columns, sample prep and services. Also in January we announced a strategic partnership with Cell Signaling Technology to supply antibodies for use with Dako-branded diagnostics products. We had solid growth worldwide as governments and major food manufacturers managed the challenges of a complex global food supply and public food safety demands.
+
+Officer: Second, shipping challenges at our new Americas logistics center delayed some customer shipments until Q3. Our recently introduced A-Line supply portfolio is ramping well above expectations.
+
+C: Mike, can you just clarify how much of the $30 million delay was self-inflicted versus – the shipping center stuff versus the customer order side?
+
+C: Number one, is this an area where some of the shipment delays are having an impact?
+
+Inc.: In the diagnostics business, just going through the slides, the delayed Q1 shipments, is there a way to quantify what that helped in the quarter?
+
+Mullen: We also resolved previous start-up issues in our Americas Logistics Center, which delayed $15 million of shipments last quarter.
+
+Mullen: In the second quarter year ago, we experienced $50million of shipment delays due to startup challenges with our new U.S. Core revenue growth in Q2 was 10% led by strength in contract services, LC columns and lab supplies.
+
+Now let me highlight 3 key results: The InfinityLab portfolio consists of this new line of LC instruments along with columns, supplies and services.
+
+Hirsch: But Henrik, who heads our order fulfillment and the supply chain organization has also committed to a material decrease in inventories.
+
+Mullen: We just introduced a new range of innovative and differentiated supplies.
+
+Hirsch: And OSS, under Henrik, the order fulfillment and supply chain organization, which has delivered greatly in '16 is looking at opportunities to deliver even more in '17, which would help us bridge the gap.
+
+Mullen: And we think that the transformation that's underway in our supply chain allow us to have some cost reductions in the future.
+
+Mullen: We noted in our Q3 call that NASD revenues are batch based which makes them vary from quarter-to-quarter, depending on the timing of customer acceptance.
+
+Mullen: One is the NASD business which we described in the call as really being a batch based business, kind of depends on when the customer wants to finish up the batch.
+
+Inc.: Fueled by our innovation investment, our consumables business was strong across both chemistries and supplies.
+
+Inc.: So that will also be one more example of things we're doing in the supply chain to lower cost.
+
+Hirsch: Our core revenue growth would have been more than 1 percentage point higher if not for ICP-MS shipment delays and the recently announced reorganization of Chinese government ministries.
+
+Hirsch: What is new versus the previous guidance are the shipment delays on ICP-MS and the reorganization of the Chinese government ministries.
+
+Mullen: We were able to beat our EPS guide and the consensus on the EPS side, but we hadn't seen the ICP-MS shipment delays or the reorganization of the Chinese food ministries.
+
+Mullen: And the something behind it, to your question, Paul, would be really very heavy work in the -- or the fulfillment area, manufacturing, particularly focused on material costs, supply chain, value engineering will be big movers for us in terms of reducing our ongoing material costs.
+
+Mullen: This hub will enable faster delivery of parts supplies and consumables to laboratories. As we've mentioned previously NASD revenues are batch based, which can make the revenue vary from quarter-to-quarter depending on timing of customer acceptance. Looking into 2019, if the tariffs remain in place, we plan to aggressively reduce the remaining effect via potential changes in our prices and further adjustments to our Supply Chain. The increase in tariffs effective early July is expected to have a negative impact of $3.5 million, as we have initiated actions to our supply chain.
+
+Mcmullen: Obviously it's creating some work for us relative to adjusting our supply chain and production locations to mitigate the duty impact side of things, but in terms of customer buying behavior have not seen any real changes.
+
+Peterson: And then on the supply chain dynamics, can you maybe flush that out a little bit? So can you may be just talk about how you are thinking about potentially moving Supply Chain if you need to?
+
+Mcmullen: Oh, yeah I forgot about that so relative to the Supply Chain, as I mentioned in my script, we took some actions actually in advance of the formal announcement of the tariffs, so we've already relocated our production for China-made products into our site in Wilmington Delaware and now we're in the process of moving aspects of the Supply Chain which is also subject to the tariffs, but we've already moved the production in some of the
+
+Donnelly: Just expanding on Tycho's question on supply chain given the tariffs and focused, could you just walk us through the import export dynamic in China, just looking explicitly kind of how much of the China revenues is being imported from the U.S.
+
+Mahon: Balanced gains in both LSAG and ACG were driven by strength in spectroscopy, LC-MS, supplies and services. This was due to product mix and volume, as well as our order fulfillment and supply chain organization continuing to do an outstanding job driving cost savings using our “Agile Agilent” approach.
+
+Willoughby: You made a comment about the $4 million a quarter, just being up slightly, just wondering is that including any impacts from pricing or supply chain as you doing as a potential offset?
+
+Mullen: He has been on Mark's staff for several years and is currently running out chemistries and supplies division. We have donated instruments and supplies to four clinical and research institutions based in China to support these research and drug development efforts.
+
+Blicker: Maybe just to round out the China dynamic quickly, can you provide some more color on your supply chain exposure? But how should we think about your direct and indirect supply chain exposure?
+
+Mullen: And as we have a very diversified global footprint in terms of supply chain and manufacturing capabilities, we think the near term, we are in pretty solid shape relative to ability to meet our commitments from a he shipment perspective. based tariffs, we actually had initiated a movement of a lot of our supply chain out of
+
+Mahon: Just to follow-up, we have twice weekly calls with our team in China, inclusive of logistics as well as our supply chain.
+
+Mullen: When we experienced significant disruption to business activity in late March, we made change in our supply chain, logistics and business operations. During February and March, our overall business was up about 1%, however, in late March, we faced significant disruption in business activity as Europe and the Americas restricted access to facilities. We expect continued pressure in these markets throughout the rest of the year, although we are seeing some pockets of growth in chemical production regionally as some customers shift supply chains.
+
+Mahon: We generated $313 in operating cash flow during the quarter, which is a $61 million improvement over last year, despite building some raw material inventory to assure supply.
+
+Peterson: And on the uncertainty, chemical and energy, you mentioned customer shifting supply chains.
+
+Mullen: So I think for C&E for Q3, basically, we assume than it kind of looks like Q2 and with the potential that the investments that we're starting to see inclinations of a regional approach to this pandemic is really cause many parts of world to rethink their supply chain.
+
+Mullen: I think what we wanted to point out, there actually are some little glimmers of positive aspects of C&E business, particularly the COVID-19 has exposed the fragility of the world’s supply chain.
+
+Bruin: So you mentioned that you’re seeing some of your chemical customers think about their supply chains and move around.
+
+Mullen: We – under potential scenarios around changes in trade policies and supply chain.
+
+Bruin: While Agilent doesn’t do – you don’t supply testing products for COVID-19.
+
+Mullen: And Tycho, the supply chain consideration and discussions still happen and it gets added a level of stability, albeit down to this -- into the space.
+
+Mullen: I mean, many geographies are now looking at the security of their supply chain, both in the pharma side as well as in the chemical marketplace where they're providing precursors into the APIs for the pharma chains. And I can say also from an Agilent perspective, we're working hard to make sure that our supply chain is secure as well. So, I think that the COVID-19 pandemic is a real wake up call to really some vulnerabilities in some aspects of supply chain.
+
+Mahon: We experienced strong growth across all regions and segments as we continue to see global investments across the entire food supply-chain.
+
+Mullen: Yeah, I'm not sure I accept the premise that do you need to have huge operating losses to have the business depend on the type of play you're trying to make here.
+
+Mahon: That's a great question, Puneet, and what I would say is, first of all, just a shout out to our OFS team, our supply chain organization, who've just done a fantastic job of being able to manage the increased demands on a increasingly fragile supply chain or logistics, I would say. It depends on what group, but overall, we hadn't built any expectation of significant price increase or decreases into our business.
+
+Couillard: And then just one more, it doesn't sound like, based on your prepared remarks today, but to what extent if at all are you seeing any supply constraints, printed circuit boards or other marked materials?
+
+Mullen: Brandon, I just would echo what Bob mentioned earlier, our office team that is on a spectacular job, so in our remarks you heard we talked about some strong orders, order growth higher in China and C&E, but that was not at all tied to any supply chain constraints.
+
+Mahon: And our supply chain team is doing a tremendous job getting our products to customers despite the increase in demand.
+
+Meehan: You talked about the job that your team is doing, managing the supply chain. And when you look at the fourth-quarter guidance, is that -- are you taking any more prudent or conservative type approach based on what's going on in the supply chains?
+
+Mullen: I think everybody is talking about the supply chain constraints on a global basis. And we also have done things as identifying a changing alternatives source, supply.
+
+Mullen: Growth is broad-based driven by strength in service contracts and on-demand services, as well as for chemistries and supplies. We are also moving the Chemistries and Supplies Division to LSAG.
+
+Mahon: Before I get into the details, I want to acknowledge our supply chain team, which has been doing a great job managing in a very challenging global environment. We expect ACG to grow at high-single-digits with both services and our chemistries and supplies businesses growing comparably, while LSAG is expected to grow in mid-single-digits.
+
+Kumar: A lot of questions around supply chain inflationary environment.
+
+Bruin: Any evidence of stocking transportation supply chains degree on the consumable side and just an update on ResBio, that looks like it so lagging its largest rotations?
+
+Mullen: If we saw continued, greater than expected disruptions in the supply chain that may impact demand, particularly in some of the applied markets that could do it.
+
+Leonard: And then, a follow-up on the shift in chemicals and supplies from ACG to LSAG.
+
+Waldman: Wanted to start with a quick follow-up on supply chain.
+
+Mullen: When I use supply chain, that means material constraints and then we have logistics.
+
+Mullen: Our chemistries and supplies business, which moved over from ACG this year, continue to do very well, delivering double-digit growth.
+
+Souda: But maybe just talk to us about the sort of the cadence wise in terms of supply chains. Obviously, we are hearing -- we have a number of questions that we get on supply chains frequently. So just wondering what’s your level of confidence on the supply chain and turning those order books into orders?
+
+Mullen: So, first of all, I’d say, that the supply chain environment continues to be quite challenging. So while I don’t want to imply that it’s all sunny out there in terms of the supply chain, we have been working on this thing for a while.
+
+Mullen: So we are hearing lots of discussions about dual sources of critical components, onshoring of previously offshore critical supply chain elements. So I think the continued supply chain challenges that the world is seeing is only putting more emphasis on that direction.
+
+Mahon: Second quarter gross margin was 55.7%, up 30 basis points from a year ago as pricing actions and productivity helped offset inflationary pressures tied to ongoing supply chain constraints and higher logistics costs. Cash flow in the quarter was impacted by the transitory impact of COVID-related lockdowns in China as well as increased inventory to fulfill strong demand in a challenging supply chain and logistics environment, as expected.
+
+Mullen: We delivered inline growth, increased margins by 140 basis points and exceeded our EPS expectations during a time of rapidly growing inflation, continued supply chain challenges and the effects of a COVID-related lockdown in a key market. In times like this, our customers want to work with people and companies they can rely on.
+
+Mullen: They're being driven by capacity expansion for supply chain concerns, move to new materials, investments in semiconductor batteries.
+
+Bruin: So, we've been getting a lot of questions from investors basically asking if what the instrumentation sector is seeing is sort of like a pull-forward of the budget flush earlier in the year because customers are worried about delays in products, supply chains or anything like this.
+
+Mullen: And I think the supply chain challenges, if you will, are no better, no worse. So, there's nothing that would be -- from a supply chain standpoint that would be encouraging customers.
+
+Mahon: There's still going to be a regionalization of investments and capacity around semiconductors and so forth to bring them closer to the markets, whether that be here in the U.S., Europe and other places to diversify that supply chain.
+
+Waldman: Just trying to get a sense on how much of this is a reflection of stronger orders versus potentially a function of tighter supply, maybe even the China GC facility shutdown in fact.
+
+Mullen: We've had some great support from the construction teams are supporting our effort here, but also have experienced some COVID-related to supply chain issues.
+
+Mullen: While we continue to make good progress in the construction of Train B, we have seen some supply chain-related delays and are now targeted a midyear 2023 go-live, a slight delay.
+
+Mahon: Third quarter gross margin was 56.4%, up 50 basis points from a year ago as pricing actions, volume and productivity helped to offset inflationary pressures tied to ongoing supply chain challenges and higher logistics costs.
+
+Couillard: And could you elaborate a little more specifically on kind of where the supply chain issues exactly what those are that are kind of pushing the delay?
+
+Mullen: I think the global supply chains are pretty well publicized, but we thought it was – we thought we should in the spirit of transparency let you know we are still on track for revenue coming out of the facility in ‘23, but maybe a month or two later than you thought initially.
+
+Mahon: And as Mike said, I mean we are not out of the woods, certainly in supply chain challenges and COVID situations.
+
+Mahon: But I think it all depends on what the right asset and what it looks like.
+
+Waldman: First, Mike, wondered if you could provide more context on the supply chain situation, how supply and cost to track versus your expectations over the last 90 days.
+
+Mullen: So supply chain challenges are still out there, but our team continues to do an excellent job navigating them, getting the material that we need for our customers.
+
+Mullen: I mean, I think – remember, the chemical piece is going into some of these supply chains as fabs go up and other things.
+
+Donnelly: Can you just talk about – I mean it sounds like things clearly picked up as we went, obviously, on the supply side and you guys kind of got back online.
+
+Mullen: Throughout the year, we navigated market uncertainties, inflation, COVID-related shutdowns and supply chain and logistics constraints. As expected, our NASD business delivered high quarterly revenue on a sequential basis given the plant shutdown last quarter.
+
+Mahon: Orders also grew again during the quarter, while outstanding execution from our order fulfillment and supply chain teams enabled us to start working down our record backlog.
+
+Couillard: And then with supply chain loosening, which it sounds like they are, what are the implications for that in terms of working capital as you move through the balance of the year?
+
+Mahon: And then I think in terms of supply chain, -- it is -- we think it is improving, but it's not back to kind of pre-COVID levels, both on the standpoint of being able to get products to customers, but also procuring raw materials and the costs associated with that. But -- we do think it is improving, but we've increased our stocks of critical supplies.
+
+Vatnsdal: Last quarter, you guys said that there were some supply chain delays as you guys were building up that manufacturing line.
+
+Waldman: Then Bob or Mike, curious to get your updated thoughts on supply chain and what you're seeing from a component availability and cost perspective entering '23? And I guess, whether or not your guide assumes improvements in either of these or maybe if supply chain improvement could represent upside to the guide?
+
+Mahon: I do think that some of the costs have come down but there we're still having to purchase things in the aftermarket to be able to ensure supply and deliver to customers.
+
+Donnelly: I know last quarter, you guys started eating into the backlog a little bit which is natural, just given the supply chain is normalizing a little bit.
+
+Mullen: As a trusted partner that our customers know they can rely on, despite the current market environment, I remain confident in our ability to deliver on our shareholder value creation model.
+
+Mullen: We remain a trusted partner, our customers though they can rely on in both good and challenging times.
+
+Mullen: And I think what we're seeing again is the investments being made in advanced materials relative to the semiconductor supply chain and also the fab is driving productivity.
+
+Mullen: I mean, we've evolved our view of long-term growth into China because we actually expect some of the supply chain moves and other things that have been going on that you'll see a growth, more growth in Europe which has been more of a slower grower for us geographically.
+
+Donnell: Look, I think on the BIOSECURE Act, we see normal -- people are looking at their supply chains, and that's positives and negatives around the globe.
+
+Mahon: What I would take it if I took it into two chunks, actually, we've been working on diversifying our supply chain particularly within China, you know, China, back in eighteen, nineteen when the first tariffs came and then, obviously, double down on that resiliency with COVID.
+
+Donnell: Maybe I can start off by talking about our, you know, our US supply chain in there. We have many supply chain areas across the globe that we can move around, and we've done that before since 2018.
+
+===== RECORD 2 =====
+Company: Apple Inc.
+Ticker: AAPL
+Sector: Information Technology
+Industry: Technology Hardware, Storage & Peripherals
+Transcript Count: 45
+Filtered Turn Count: 619
+Matched Keywords: bottleneck, capacity, capacity constraint, capacity constraints, delay, delays, depend on, depends on, distribution, facilities, factories, factory, freight, inventory, logistics, manufacturing, network, operational, plant, plants, procurement, produced, producing, production, raw material, raw materials, relies on, rely on, shipment, shipments, shipping, shortage, shortages, supplier, suppliers, supply chain
+
+Oppenheimer: Despite supply constraints on iPhone 5S, we sold 51 million iPhones compared to 47.8 million in the year ago quarter. Turning to iPad, despite supply constraints, we sold over 26 million iPads during the quarter, compared to 22.9 million in the year ago quarter.
+
+Oppenheimer: For iPhone, specifically last year, the supply of iPhone 5 was short for the entire December quarter, and we were not able to achieve supply and demand balance for iPhone 5 until the March quarter. In contrast, this year we executed the fastest rollout for our new iPhones, and we included China in wave one, in the launch in September, and we were able to exit the quarter in supply and demand balance. We didn’t reach supply and demand balance for the iPad Mini until the March quarter last year, and we increased inventory in the March quarter by 1.4 million units. In contrast, this year we exited the December quarter near supply and demand balance.
+
+Cook: Second, we ended the December quarter last year with a substantial backlog with iPad mini that was subsequently shipped in the March quarter, whereas we ended the December quarter this year near supply demand balance. We’ll keep investing in our supply chains promote scale and efficiencies, expanding our global presence by building retail stores, investing in marketing and distribution and extending our reach into new markets.
+
+Cook: Our operational team has done an extraordinary job executing the manufacturing ramp throughout the entire supply chain. In addition to Apple's strong business performance over the past four quarters, I am incredibly proud of all of our work to protect the environment, to advance human rights, to improve working conditions in the supply chain and to change the way teachers teach and students learn.
+
+Sachs: And then my second question is, looking at that current supply constraints of the iPhone, could you confirm that your guidance is assuming you will reach supply demand balance before the end of the quarter, I think that's what was implied by your commentary on channel inventory? And related to that, could you give us some more color on what you see as the key bottlenecks at this point for supply on the iPhone side?
+
+Cook: That said, today demand is far obstructing supply. It is unclear looking at the data when supply will catch up with demand. And so I don’t want to leave you with a view that we know that we're going to get to a supply-demand balance on both of the new products this quarter because I don’t know that at this point. And -- but that said, I am really confident that supply is going to be great and that's the reason you see incredibly strong guidance that we're giving from $63.5 billion to $66.5 billion.
+
+Cook: You can use Apple Pay up and down Mainstreet, to pick up a prescription at Walgreens at Duane Reade, get office or school supplies at Office Depot and Staples and shop for groceries at national and regional stores from coast-to-coast, including BI-LO, Harvey’s, Save Mart, Wegmans Food Markets, Whole Foods and Winn-Dixie among others.
+
+Maestri: We had a 200,000 unit decline in iPhone channel inventory during December quarter this year, compared to an increase of about 1 million iPhones during the year ago period, and we were not able to reach supply demand balance until this month.
+
+Cook: Just recently we became in supply demand balance on the 6 and 6 Plus in January.
+
+Cook: We’re making many strategic investments in Apple’s future, in research and development, in our supply chain, and in our infrastructure, and we’ve made 27 acquisitions in the last six quarters. We also announced an innovative new partnership with the Conservation Fund to permanently protect more than 36,000 acres of working forest in Maine and North Carolina to help offset the impact our packaging has on the world’s supply of sustainable virgin fiber.
+
+Cook: And in any situation, whether it’s the watch or in the past on iPad or on iPhone, when demand is much greater than supply, it’s difficult to gauge exactly what it is.
+
+Director: We started taking preorders in nine countries on April 10, and demand immediately exceeded supply by a wide margin.
+
+Director: And so to the degree that sales are distributed in the countries with disproportionally with shorter supply chains, or the standard deviation demand is less, we would always choose to have less.
+
+Director: Secondly to provide a bit more color, sales of the Watch did exceed our expectations and they did so despite supply still trailing demand at the end of the quarter.
+
+Cook: We returned almost $50 billion to shareholders through dividends and share repurchases while continuing to invest confidently in research and development, marketing and distribution, our retail and online stores, our supply chain and our infrastructure. We exited the quarter with demand for our new iPhones exceeding supply but we’ve made good progress with our manufacturing ramp in the initial weeks of October. I just returned from a four day visit to Hangzhou and Beijing where we announced major new initiatives to provide renewable energy for our supply chain.
+
+Maestri: We exited the quarter with demand exceeding supply and channel inventory below our target range of 5 to 7 weeks.
+
+Phone sales come from three sources: Demand has been very strong and exceeds supply at this point, but we're working hard to get the iPhone SE into the hands of every customer who wants one as quickly as possible. As always, we're contributing to society beyond our products, promoting the use of renewable energy across our facilities and inside our supply chain and developing cutting-edge technologies to revolutionize recycling of the materials we use. We are forging ahead with important investments in research and development, in our infrastructure, and in our supply chain.
+
+President: It was a particularly challenging comparison to the record quarter a year ago, when iPhone sales grew 40%, as we entered last March quarter in supply/demand imbalance, which was recovered during the quarter. The guidance also reflects a range of possible scenarios related to how quickly we can get into supply/demand balance for iPhone SE.
+
+We believe the difference comes primarily from three areas: first, the $2 billion-plus channel inventory reduction I just mentioned; second, the effect of the channel inventory reduction and the launch of iPhone SE on iPhone ASPs, as well as the current constrained supply of iPhone SE; and third, different estimates for Mac, which we expect to grow sequentially at a rate similar to what we have experienced in the past June quarters.
+
+Director: We are currently supply constrained, but we'll be able to work our way out of this at some point.
+
+Director: What we've seen is that it depends on what you compare it to. And so I think it depends on people's reference points.
+
+Inc.: We had a very successful global launch of iPhone SE, and demand outstripped supply throughout the quarter. We brought on additional capacity and were able to achieve supply/demand balance as we entered the September quarter.
+
+Inc.: Demand continues to outstrip supply, but we're working very hard to get them into customers' hands as quickly as possible.
+
+Inc.: Worldwide demand for iPhone 7 and 7 Plus has significantly outpaced supply, particularly on iPhone 7 Plus, and we're working very hard to get the new iPhones into the hands of our customers as quickly as possible.
+
+Inc.: As Tim said, we are very supply constrained on iPhone 7 Plus this year. We're simply more supply constrained this year than we were a year ago.
+
+Inc.: But maybe the most important element of this is the fact that we are supply constrained on 7 and 7 Plus.
+
+Inc.: Demand for iPhone 7 Plus exceeded supply throughout the quarter, and we came into supply/demand balance in January. We were supply constrained for the new MacBook Pro throughout the December quarter and are just now coming into supply/demand balance.
+
+Inc.: Also, strong customer interest left us in supply/demand imbalance for several of our products throughout the quarter this year.
+
+Inc.: In addition to all of that, we did under-call the number of iPads that would be in demand for the quarter, and that compounded a shortage issue that we had with one of our suppliers.
+
+Inc.: Demand for AirPods significantly exceeds supply, and growth in Beats products has also been very strong.
+
+Inc.: Turning to iPad, we sold 8.9 million units, which was ahead of our expectations despite supply constraints throughout the quarter.
+
+C: And this was a product that was pretty severely supply-constrained in the December quarter. And I just wonder whether there are any lessons learned as you go forward into future product launches around how you manage the timing of announcing a product when there are supply constraints, and how you might work with the supply chain differently around ramping some of these components that have particular difficulties around the yields early on.
+
+Inc.: And so it took us a little while to adjust all the way back through the supply chain and to bring iPhone 7 Plus into balance, which occurred early this past quarter.
+
+C: And if I could just follow up, on the iPhone side, there's been a large amount of discussion in blogs and among your component suppliers that the timing this time may be somewhat different and delayed versus past.
+
+Cook: The team did a great job of getting into supply demand balance there in December.
+
+Maestri: We were able to reach supply/demand balance in December, which placed the entirety of our channel fill for iPhone X in Q1 and this will have an effect on both units and ASP in Q2.
+
+Inc.: We're also driving our supply chain to use clean energy.
+
+Inc.: We're always working to leave the world better than we found it and as part of our commitment to address climate change and increase the use of renewable energy in our supply chain, we recently announced a first of its kind investment fund in China.
+
+Inc.: We also made progress in doing the same in our supply chain.
+
+C: Tim, given the current trade negotiations and broader geopolitical risk, do you have any plans to consider diversifying the supply chain?
+
+November: different iPhone launch timing from a year ago, FX headwinds, supply constraints on certain products and macroeconomic conditions in emerging markets.
+
+Maestri: Revenue from this category was up over $1.8 billion compared to a year ago, thanks to the amazing popularity of Apple Watch and AirPods both of which were supply constrained as we exited the quarter.
+
+Cook: With the help of these 44 suppliers, we will exceed our goal of bringing four gigawatts of renewable energy into our supply chain by 2020 with over one additional gigawatt projected within that time frame.
+
+Cook: And so, that's the nature of a global supply chain.
+
+Cook: We're disassembling, recycling or refurbishing millions of devices every year with the help of Daisy, our recycling robot, and we're pushing the entire global supply chain toward recycled or renewable materials.
+
+Cook: Both AirPods and Apple Watch were must have holiday gifts, helping drive unprecedented results for the category, even as we face supply constraints for Apple Watch Series 3 and AirPods Pro. And we’ve already seen a strong response from the Pro community from developers, photographers and music producers to filmmakers and scientists who rely on the Mac to create their life’s best work. We also want to take a moment to congratulate all the Grammy winning and nominated artists this past weekend who rely on Logic Pro 10 and the Mac to create incredible music we all love.
+
+Cook: I'll talk about supply chain and customer demand some to give you some color. With respect to the supply chain, we do have some suppliers in the Wuhan area. With respect to supply sources that are outside the Wuhan area, the impact is less clear at this time. The reopening of those factories after Chinese New Year has been moved from the end of this month to February 10th, depending upon the supplier location, and we've attempted to account for this delayed start up through our larger range of outcomes that Luca mentioned earlier.
+
+Cook: At the same time that they were leaving no stone unturned to get our latest generation of devices manufactured and into our customers’ hands, our worldwide network of supply chain partners, logistics and operations folks in every part of the Company were also sourcing more than 30 million masks for frontline medical workers, ensuring they’re donated to places of greatest need in every region around the world. We worked with everyone from Oprah to Lady Gaga to inform, entertain and give back through Apple TV and services like FaceTime and Messages set new all-time records for daily volume during this quarter as users relied on their devices to stay connected in a new reality. During a quarter where circumstances evolve by the hour, we have been gratified by the resilience and adaptability of our global supply chain. While we felt some temporary supply constraints in February, our operations team, suppliers and manufacturing partners have been safely returning to work and production was back at typical levels toward the end of March. Teachers and students around the world are relying on our technology to teach, learn, and stay connected with each other. In the next five weeks of the quarter, as COVID-19 started impacting China, iPhone supply was temporarily affected, as well as demand for our products within China. Our global supply chain is profoundly durable and resilient. We have shown the consistent ability to meet and manage temporary supply challenges like those caused by COVID-19.
+
+Maestri: iPhone revenue of $29 billion, declined 7% year-over-year as both iPhone supply and demand were affected by the impact of COVID-19 at some point during the quarter. On the supply side, we suffered from some temporary supply shortages during February, but we’ve been extremely pleased with the resilience and adaptability of our global supply chain, as well as its ability to get people back to work safely when circumstances allow. Our operations team and manufacturing partners put forth an extraordinary effort to restore production quickly, and we exited the quarter in a good supply position for most of our product lines. Our global supply chain is back, up and running. We are in a typical supply position, including our usual ramp associated with new products recently launched.
+
+Cook: The next five weeks were spent sort of reacting and getting the supply chain back up in full force and working through the sharp decline in China that I already talked about.
+
+Daryanani: And do you feel comfortable that the supply chain and the manufacturing base is well situated today to launch the traditional fall products that they used to get from Apple?
+
+Cook: As you know, our supply chain is global. I think, you’d have to conclude, or at least I conclude that if you look at the shock to the supply chain that took place this quarter, for it to come back up so quickly really demonstrates that it’s durable and resilient.
+
+Cook: This remarkable performance came in spite of supply constraints on both products. We are just as proud of our announcement this month that Apple will be fully carbon-neutral by 2030 across our entire supply chain and including the energy use of every device we make as we are of any hardware innovation because they spring from the same instinct to leave the world better than we found it.
+
+Maestri: This year we project supply to be available a few weeks later.
+
+Cook: Outside of iPhone, each of our product categories saw strong double digit year-over-year growth, despite supply constraints in several product categories. We’ve committed to be fully carbon neutral by 2030 across our entire supply chain and device usage, as massive wildfires, hurricanes and floods, bring home the consequences of climate change for all of us. We announced Apple Fitness Plus, which delivers deep personalization and integration across the fitness tools our users love and depend on.
+
+Maestri: Our products outside of iPhone grew a combined 30%, despite supply constraints on iPad, Mac and Apple Watch throughout the quarter. Next, I’d like to talk about Mac; revenue was by far an all-time record at $9 billion, up 29% over last year and $1.6 billion above our previous record, in spite of supply constraints during the quarter. IPad performance was also very impressive, with revenue of $6.8 billion, up 46%, and our highest September quarter revenue in eight years despite supply constraints.
+
+Maestri: And so sometimes, depending on the mix of products we have, we can see margin expansion through mix, as well.
+
+Chatterjee: But if you can share any kind of thoughts about how you're preparing in relation to either inventory levels, or sourcing from the supply chain, to prepare for any potential disruption, like we had earlier this year?
+
+Nealy: I wanted to ask a little bit about the supply chain. Given your latest start from manufacturing to the flagship phone line of this year, do you think that supply will be able to meet demand through the end of the calendar?
+
+Cook: And that's not a surprise where at the front end of the ramp, if you will, and how long we will be supply constrained, it's hard to predict. But right now we are supply constrained, we are also supply constrained for avoidance of any confusion where supply constrained on Mac, we are supply constrained on iPad. And we're supply constrained on some Apple watches as well.
+
+Cook: Hope for healing, for unity and for progress begins with and depends on addressing the things that continue to wound us.
+
+Sacconaghi: And should we be thinking about above-seasonal iPhone growth, given that you're still not in supply-demand balance and you had fewer selling days in fiscal Q1?
+
+Maestri: So we -- and we still had some level of supply constraints, which we believe we're going to be able to solve during the March quarter.
+
+Suva: It seems like there's been some news reports of moving supply chain there.
+
+Cook: In addition to the progress we've made in our own efforts to achieve our pledge of a net zero carbon footprint by 2030 across our entire supply chain and use of our products, we're proud to play a role in the growing ripple change taking place across the private sector. We also want to do everything we can to connect users to life-saving vaccinations that are in ever greater supply.
+
+Maestri: First, keep in mind that due to the later launch timing and strong demand, iPhone only achieved supply-demand balance during the March quarter. Second, we believe supply constraints will have a revenue impact of $3 billion to $4 billion in the June quarter.
+
+Huberty: Or were there some supply disruptions during the quarter that caused you to drain inventory and create that tightness that you're talking about for June?
+
+Maestri: And so we reached supply-demand balance only during the March quarter, which makes obviously the sequential decline steeper than usual. And then this $3 billion or $4 billion of supply constraints that Tim just said, primarily on iPad and Mac. So I would say that on the inventory side, it was pretty straightforward Obviously, given that the supply constraints are on the iPad and on the Mac, we wish we had more inventory of iPad and
+
+Mohan: Are the supply constraints of the $3 billion, $4 billion impact included in that? And any color on what specifically is driving the supply constraints of the subcomponent level?
+
+Maestri: And the $3 billion to $4 billion supply constraints that we mentioned.
+
+Kumar: I'm curious what went in your favor to be able to secure that kind of supply that you were able to beat by, I think it was $11 million or so?
+
+Cook: We did not have a material supply shortage in Q2. And that happens all the way through the supply chain.
+
+Kumar: And then for my follow-up, I know there's a lot of moving parts, Tim, but with the economy sort of reopening here in the U.S., and you mentioned about supply constraints possibly on the Mac and the iPad.
+
+Cook: Users continue to rely on iPad and Mac to work, learn, create and connect.
+
+Maestri: For Mac, despite supply constraints, we set a June quarter record of $8.2 billion up 16% over last year, with June quarter revenue records in most markets we track around the world. iPad performance was also strong with revenue of $7.4 billion up 12% in spite of significant supply constraints. And third, we expect supply constraints during the September quarter to be greater than what we experienced during the June quarter.
+
+Caso: If I could follow-up with regard to the supply constraints, and do you expect those supply constraints to persist through the December quarter as well? And then, in conjunction with that, what additional costs are you absorbing because of the supply constraints? Is that having an effect on gross margins or just product costs in general, as you perhaps pay a little more to get more supply?
+
+Cook: In terms of supply constraints, and how long they will last, I don't want to predict that today.
+
+Suva: But we look at a world of pretty unprecedented whether it be COVID, the Delta variant, China floods, supply chain, components.
+
+Sankar: I think, Tim, you mentioned in your prepared comments that in September quarter, there's going to be greater impact on supply constraints on the iPhone and iPad. Or, what exactly is the choke point on the supply?
+
+Cook: The legacy nodes are where the supply constraints have been on the silicon.
+
+Cook: Demand was very robust, and we set a new September quarter record of $83.4 billion, up 29% from last year and in line with what we discussed on our last call, despite larger-than-expected supply constraints. We estimate these constraints had around a $6 billion revenue dollar impact, driven primarily by industry-wide silicon shortages and COVID-related manufacturing disruptions. The App Store continues to help people find the apps they depend on to stay productive, creative and entertained. Customers have never relied on our products more, and our retail teams have truly answered the call. And this quarter, we made new strides towards reaching our goal of carbon neutrality across our entire supply chain and the life cycle of our devices by 2030. We’re very encouraged to see the growth in this area, and we will continue to drive those changes in the supply chain in the months and years to come.
+
+Maestri: We set a September quarter revenue record of $83.4 billion, an increase of nearly $19 billion or 29% from a year ago, despite larger-than-expected supply constraints. On the product side, revenue was $65.1 billion, up 30% over a year ago as we experienced better-than-expected demand for our products, despite supply constraints that we estimated at around $6 billion. iPhone revenue grew 47% year-over-year and set a September quarter record of $38.9 billion, despite supply constraints as customer demand was very strong. For Mac, we set an all-time revenue record of $9.2 billion, despite supply constraints, driven by strong demand for our M1-powered MacBook Air. iPad performance was also strong with a September quarter revenue record of $8.3 billion, up 21%, in spite of significant supply constraints as customer demand for the iPad Pro also powered by M1 was very strong. As we mentioned earlier, during the September quarter, supply constraints impacted our revenue by around $6 billion. We estimate the impact from supply constraints will be larger during the December quarter. We expect revenue for each product category to grow on a year-over-year basis, except for iPad, which we expect to decline year-over-year due to supply constraints.
+
+Cross: Tim, I’m wondering, can you talk a bit more about specific supply chain issues you saw and how you’ve seen improvements I think during the current quarter, and how we should think about what products do you expect to see most impacted going forward?
+
+Cook: If you look at Q4 for a moment, we had about $6 billion in supply constraints, and it affected the iPhone, the iPad and the Mac. And the second was COVID-related manufacturing disruptions in Southeast Asia. And so, for this quarter, we think that the primary cause of supply-chain-related shortages will be the chip shortage.
+
+Daryanani: I guess, when I think about the supply chain headwinds, and you’re talking about $6 billion in September, getting bigger in December. And if you think about the supply chain bottlenecks -- you were the COO.
+
+Cook: But on legacy nodes, we compete with many different companies for supply.
+
+Huberty: Given the supply chain is blurring the demand picture for iPhone 13, what data points can you share that help investors understand whether demand is tracking to a product cycle that is flat, growing or down from the very strong iPhone 12?
+
+Cook: And we’re working feverishly on the supply side of that.
+
+Vogt: So, you covered the supply chain in pretty extensive detail on the call. So, what I mean by that, is there sort of a recalibration needed or an adjustment around your supply chain philosophy either from a partner perspective or maybe a regional perspective?
+
+Cook: And so, what we’re doing is working with our partners on making sure that they have supply that we need and making sure that our demand statements are accurate as we see them and so forth.
+
+Vogt: Do you think sort of this business model, as it’s currently sort of put together globally, is sort of a permanent structure, meaning carriers are going to be integral part of driving demand for iPhones, or is there a sense that maybe it’s a little bit more transitory depending on the part of the cycle that we’re in?
+
+Sankar: And Tim, I will give you a reprieve from the supply chain questions.
+
+Chatterjee: And as a follow-up, I guess, back to the supply chain but I wanted to just ask more relative to cost implications there. And is that something you’re seeing coming through the supply chain?
+
+Suva: And then, probably for Luca on supply chain, when you mentioned supply chain headwind is going to get worse and you mentioned $6 billion this quarter, there’s two ways to think about your terminology of worse.
+
+Cook: On the supply constraints, what we’re saying is that the amount of -- the nominal amount of supply constraints for Q1, we estimate to be larger than $6 billion. And so, it’s important to know that we’re getting a lot more supply in Q1 than we had in Q4, obviously, because our sequential growth is significant. And so, the amount of supply is growing dramatically. It’s just that the demand is so robust that we envision having supply constraints for the quarter.
+
+Kumar: Hey, guys, first of all, a great job managing to the supply constraints.
+
+Cook: And so, it really depends on whether we see a way to do something that’s differentiated or not.
+
+Cook: We set all-time records for both developed and emerging markets and saw revenue growth across all of our product categories, except for iPad, which we said would be supply constrained. As expected, in the aggregate, we experienced supply constraints that were higher than the September quarter. We are already carbon neutral across our own operations, and we are working intensely to meet our 2030 goal of carbon neutrality across our supply chain and the life cycle of our products.
+
+Maestri: On the product side, revenue was $104.4 billion, up 9% over a year ago, despite significant supply constraints. We grew in each of our product categories, except iPad, where supply constraints were particularly pronounced, and set all-time records for iPhone, Mac and Wearables, Home and Accessories. iPhone revenue grew 9% year-over-year to an all-time record of $71.6 billion despite supply constraints, thanks to a remarkable customer response to our new iPhone 13 family. For Mac, revenue of $10.9 billion was an all-time record with growth of 25% year-over-year driven by strong demand for our newly redesigned MacBook Pro powered by M1 despite supply constraints. iPad generated $7.2 billion in revenue, down 14% year-over-year due to very significant supply constraints, but customer demand was very strong across all models. Despite the supply shortages, our installed base of iPads reached a new all-time high during the quarter, thanks to a high number of customers that are new to iPad. We expect to achieve solid year-over-year revenue growth and set a March quarter revenue record despite significant supply constraints, which we estimate to be less than what we experienced during the December quarter.
+
+Nealy: And if it is, should we see a recovery in iPad as you move past your prime iPhone selling season and you may have better access to components or better supply as we move through the next few months of the year?
+
+Cook: From a supply constraint point of view, as you recall, we said that in Q1, the December quarter, that would have constraints more than 6, and we clearly did have constraints more than 6.
+
+Huberty: So first question just as it relates to some of the disruption you've seen on the component side, manufacturing and logistics over the past couple of years, are you starting to rethink your broader supply chain strategy or the manufacturing footprint on the back of the significant disruption? Are you happy with the overall geographic exposure that you see in the supply chain today?
+
+Cook: And I think our supply chain actually does very good considering the shortages because it's a fast-moving supply chain. And so, no, I don't see that it makes a fundamental change in the supply chain.
+
+Daryanani: I guess both up on the supply chain side, I think these continue to be fairly volatile. I'd love to get your perspective, if you feel, if things or supply chain issues are starting to alleviate or they still remain challenging? And then maybe I missed this, but could you perhaps tell us how much revenue was left on the table in December because of the supply chain issues?
+
+Vogt: And then maybe just on the supply chain. Can you help us think about sort of the quantifiable impact or maybe the costs that you're carrying due to the supply chain that may be sort of -- I don't want to use the word transitory, but we'd expect over the longer term, that might be sort of abate a little bit and you'll get a little bit of a benefit as we get past some of these supply chain issues over the next 12 months or so?
+
+Cook: The incredible customer response to our M1-powered Macs helped propel a 15% year-over-year increase in revenue, despite supply constraints. That's why we're continuing to see such a strong demand for iPad even while navigating the significant supply constraint we predicted at the start of the quarter. As we look to the environment, we are making good progress on our commitment to achieve carbon neutrality across our products and supply chain by 2030. We also recently announced a $50 million Supplier Employee Development Fund that will help workers in our supply chain discover additional educational opportunities and build new skills. Before I hand it over to Luca, I want to acknowledge the challenges we are seeing from supply chain disruptions driven by both COVID and silicon shortages to the devastation from the war in Ukraine.
+
+Maestri: We grew in each of our product categories except iPad, which remains significantly supply constrained throughout the quarter. iPhone revenue grew 5% year-over-year to a March quarter record of $50.6 billion despite supply constraints. For Mac, revenue of $10.4 billion was a March quarter record despite supply constraints with 15% year-over-year growth, driven by strong demand for our M1-powered MacBook Pro. iPad revenue was $7.6 billion, down 2% year-over-year due to continued supply constraints. Supply constraints caused by COVID-related disruptions and industry-wide silicon shortages are impacting our ability to meet customer demand for our products.
+
+Huberty: And as it relates to that in China, how should we think about lockdowns from an impact on supply and an impact on demand?
+
+Cook: And so Q2, we did have supply constraints. But looking ahead, we see two causes of supply constraints.
+
+Maestri: Keep in mind again the supply constraints that we had during the quarter our results would have been obviously better without the supply constraints.
+
+Daryanani: If I could just follow up on the supply chain the $4 billion to $8 billion impact that you folks talked about.
+
+Suva: When we hopefully someday get past all of these and the supply constraints in society and turmoil hopefully across the world, do you start to reconsider the way you do the supply chain albeit just-in-time ordering and outsourcing so much of your chips?
+
+Cook: But when you back up and kind of zoom out and look to see how the supply chain has done within the environment that you eloquently talked about, I think it's been very resilient with -- the top issue we've had clearly is the silicon shortage that I think everybody is struggling with.
+
+Suva: We've been talking about supply chain issues for multiple quarters now.
+
+Cook: I don't want to predict that, because the – that entails knowing how worldwide demand and supply are for the whole – for industries outside of even the industry we're in.
+
+Sankar: And you also spoke about a $4 billion to $8 billion supply constraint which is a large amount compared to the revenue. And I understand you have the supply constraints and the China shutdowns. I'm just kind of curious, do you think the last three quarters Apple supply chain had a better buffer inventory of semis that kind of got used up and now you're kind of more tied to whatever the true supply contains of legacy semis, or is there something else going on?
+
+Mohan: Can you also tell us how much FX is a headwind if any on a quarter-on-quarter basis and incremental Russia impact quarter-on-quarter basis and incremental supply chain impact also on a quarter-on-quarter basis?
+
+Maestri: And -- but just to repeat what I said during the prepared remarks, we're having supply constraints that are caused by the COVID-related disruptions and by the silicon shortages.
+
+Nealy: Just wanted to get your insight on how much of that you think is driven by the strong March results with the product launch and likely sellout conditions versus just real tightness in the supply chain?
+
+Cook: Today, Apple is reporting another record June quarter with revenue of $83 billion, which was better than we expected despite supply constraints, strong foreign exchange headwinds and the impact of our business in Russia. Our supply constraints were less than we anticipated at the beginning of the quarter, coming in slightly below the range we discussed during our last call. We continue to have supply constraints with Mac, but we're encouraged by the strong response from customers to our incredible lineup. iPad, like Mac, continued to see strong demand during the June quarter despite ongoing supply constraints.
+
+Vogt: I just wanted to circle back on sort of the macro and sort of the demand signals that you're seeing versus sort of the supply chains that you're facing.
+
+Vogt: And then on the Mac business, I know that you are severely supply chain constrained. But is there a way to kind of think about the impact of the market overall on the Mac business versus the supply chain? It sounds like -- I guess, it sounds like it's almost effectively 100% supply chain constrained, but we're obviously hearing, like I'm sure you guys are seeing, anecdotal evidence and some quantifiable evidence that the broader PC market is slowing.
+
+Cook: But for last quarter, what we saw was the -- when the COVID restrictions hit in the Shanghai corridor, we lost the primary source of supply for Mac units. But the negative 10 I would classify as being driven by supply. In terms of testing the demand, you can't really test the demand unless you have the supply.
+
+Bollin: Tim, I was hoping you could share a little bit more about how you're thinking about the supply headwinds. You said less severe or less worse supply challenges into September. And also, any thoughts on how or when that might influence replenishment of supply into your retail channels?
+
+Cook: And the majority of that constraint last quarter was coming out of the COVID restrictions that occurred, that resulted in plant closures and plants running at less than full utilization for some amount of the quarter, in some cases, the majority of the quarter.
+
+Suva: As you look ahead, the supply chain issues, expedited shipping and all of that, do you think probably the September quarter is kind of the worst of FX and all those headwinds and things? Or is there a little bit of timing delays due to your contractual purchase commitments that you do, that maybe your suppliers are looking at higher costs and you're benefiting from some lower contracts or maybe that has already caught up?
+
+Cook: I'm also happy to report that during the quarter, silicon-related supply constraints were not significant.
+
+Maestri: Second, we were able to satisfy pent-up demand that carried forward from the significant supply constraints we faced during the June quarter. Third, as our supply position improved, we were able to fill the channel.
+
+Woodring: Both were relatively constrained from a supply perspective.
+
+Maestri: Obviously, the FX impact on our business depends on the geographic mix of the sales that we do.
+
+Daryanani: Because evenly right now given the lead time data, it looks like your revenue trajectory in iPhones is more driven by the supply you have versus demand.
+
+Cook: The second factor, which we described in a November 6 update was COVID-19-related challenges, which significantly impacted the supply of iPhone 14 Pro and iPhone 14 Pro Max and lasted through most of December. Because of these constraints, we had significantly less iPhone 14 Pro and iPhone 14 Pro Max supply than we planned, causing ship times to extend far beyond what we had anticipated. The very strong growth was due in part to a favorable compare to the December quarter a year ago when we experienced significant supply constraints. This powerful smart speaker relies on advanced computational audio to produce an incredible listening experience.
+
+Maestri: Third, we experienced significant supply shortages for iPhone 14 Pro and iPhone 14 Pro Max in November and through December. iPhone revenue was $65.8 billion despite significant foreign exchange headwinds, supply constraints on iPhone 14 Pro and iPhone 14 Pro Max and a challenging macroeconomic environment. First, during the December quarter a year ago, we experienced significant supply constraints, while this year, we had enough supply to meet demand.
+
+Vogt: You talked about the supply chain returning back to normal after a very difficult October, November, but we're still seeing some disruptions across tech products, whether it's enterprise or consumer-facing. How do you think about your supply chain and maybe the levels of inventory or builds that you might need as we go forward to sort of insulate your business from these sort of episodic disruptions?
+
+Cook: From a supply point of view, we did see disruption from early November through most of December. And from a supply chain point of view, we're now at a point where production is what we need it to be. In terms of going forward in the supply chain, we build our products everywhere. And I think it's -- I think we have had a very resilient supply chain in the aggregate. In terms of supply for this quarter, which I think was one of your points, I think we're in decent supply on most products for the quarter currently.
+
+Cook: The channel inventory levels on iPhone, we obviously ended the December quarter below our target range given the supply challenges on iPhone 14 Pro and iPhone 14 Pro Max. But as you think about this, keep in mind that a year ago, we also exited the December quarter below our target inventory range because of supply challenges in the year ago quarter. In terms of the sizing of the constraint in Q1, what we estimate, although not with precision, is that we would -- I thought we believe iPhone would have grown during the quarter had it not been for the supply shortages.
+
+Cook: The Pro has been a -- the 14 Pro and the 14 Pro Max have done extremely well up until the point where we had a supply shortage and couldn't provide them -- couldn't provide the total of the demand.
+
+Suva: And it appears with the supply chain, you're looking at diversifying kind of operational risk not specific to any country, but just overall. And once you start opening up stores there, you could just see a complete green shoot of adoptions or any additional commentary on your view on India as now we've navigated COVID and supply chain and so many challenges over the past 2 years?
+
+Suva: And of course, supply chain was more challenged than expected.
+
+Cook: Despite these challenges, we continue to manage for the long term and to push the limits of what's possible, always on behalf of the customers who depend on our products whether it's students exploring new frontiers, developers dreaming up their next big idea, or artists taking their creativity to a whole new level. These are just the latest steps on our journey toward our 2030 goal to be carbon neutral across our supply chain and lifecycle of our devices. At the same time, we're advancing renewable energy across our supply chain, we're also sourcing more recycled materials in our products.
+
+Maestri: In small business, we see an increasing number of customers relying on Apple hardware, software and services to power their businesses forward, from accepting payments on iPhone, to tracking inventory on Mac or iPad, to managing employee devices with Apple Business Essentials.
+
+Cook: Our supply chain is truly global and we're investing all over the world. We'll continue to invest everywhere, and we'll continue to look for ways to optimize the supply chain based on what we learn each and every day and week and so forth, to ensure that we can deliver the best products and services for our customers. If you sort of step back and look at how we've performed over the last three years on the supply chain, despite this parade of horribles, if you will, between the pandemic and the chip shortages and macroeconomic kind of factors, the supply chain has been incredibly resilient, and we feel good about what we are and what our plans are.
+
+Maestri: Keep in mind, we always have differences in the launch timing across our products, and also that especially over the last few years, we've seen a certain amount of supply disruptions.
+
+Cook: Last month, Apple joined with global nonprofit Acumen in a new effort to improve livelihoods in India through clean energy innovation, and we are as committed as ever to our Apple 2030 goal to be carbon neutral across our entire supply chain and the life cycle of our products.
+
+Maestri: For both products, we experienced supply disruptions from factory shutdowns in the June quarter a year ago and were able to fulfill significant pent-up demand in the year ago September quarter.
+
+Maestri: You remember that a year ago, in the June quarter, we had factory shutdowns for both Mac and iPad.
+
+Maestri: So the impact that we're going to have on revenue and cost will depend on where the spot rates are at different points in time.
+
+Cook: This was due to challenging market conditions, as well as difficult compares against the supply disruptions and subsequent demand recapture we experienced a year ago.
+
+Maestri: Mac revenue was $7.6 billion, down 34% year-over-year, driven by challenging market conditions and compounded by a difficult compare in our own business, whereby last year we experienced supply disruptions from factory shutdowns in the June quarter and were subsequently able to fulfill significant pent-up demand during the September quarter. Similar to Mac, these results were a function of a difficult compare from the supply disruptions in the June quarter a year ago and the subsequent fulfillment of pent-up demand in the September quarter. We also expect to grow after normalizing for both last year's supply disruptions and the one extra week.
+
+Cook: To just repeat a little bit about the circumstances of the performance last quarter, in the year-ago June quarter, we had a factory disruption that lasted several weeks.
+
+Cook: Services also grew during the quarter and the Mac and iPad suffered from the same issues that the company did with the compare issues to factory disruptions in Q3 that were filled subsequently in Q4 of '22.
+
+Maestri: And also, within a specific product category, a lot depends on the kind of models that we sell because they have different margin profiles.
+
+Reitzes: I wanted to also ask about the supply chain and where is your priority? Do you have a priority to diversify your supply chain? How do you feel about Apple's supply chain around the world?
+
+Cook: Our supply chain is truly global, and so we're investing all over the world, including in the United States, we were very focused on advanced manufacturing for the U.S.
+
+Reitzes: Is it possible to give some color around what that -- I guess, having a normalized supply chain somewhat this year, what that benefit is this year and maybe contrast that with the 7 point hit from the extra week?
+
+Maestri: We did have disruptions, supply disruptions last year on the phone, on the 14 Pro and Pro Max in the December quarter a year ago. So you take into account the, the loss of the extra week, you compare it with the supply disruptions that are not going to repeat, hopefully, this year.
+
+Maestri: And second, we had COVID-related factory shutdowns that limited iPhone supply. This represents a significant acceleration from the September quarter when we faced a challenging compare due to the supply disruptions and subsequent demand recapture we experienced a year ago. As a reminder, in the December quarter a year ago, we faced significant supply constraints on the iPhone 14 Pro and 14 Pro Max due to COVID-19 factory shutdowns.
+
+Cook: And we've tried our best to get as close to the past in terms of the things that are -- that people love about our ecosystem as we can, but we are going to fall short of providing the maximum amount that we could supply, because we need to comply with the regulation.
+
+Maestri: A lot will depend on the choices that will be made.
+
+Maestri: The $5 billion, as I mentioned, a year ago we had this disruption of supply on iPhone 14 Pro and Pro Max because of the factory shutdown due to the COVID-19 situation.
+
+Cook: Keep in mind, as we described on the last call, in the March quarter a year-ago, we were able to replenish iPhone channel inventory and fulfill significant pent-up demand from the December quarter COVID-related supply disruptions on the iPhone 14 Pro and 14 Pro Max. Whether it's an entrepreneur starting a new business or a college student finishing their degree, users depend on the power and portability of MacBook Air to take them places they couldn't have gone without it.
+
+Chatterjee: How much of the momentum you're seeing would you associate with your sort of retail strategy in that market, retail expansion relative to maybe some of the supply change or the sort of manufacturing changes or strategy you've undergone or taken in that market itself.
+
+Cook: In terms of the operational side or supply chain side, we are producing there, from a pragmatic point of view, you need to produce there to be competitive.
+
+Cook: With back-to-school season upon us, MacBook Air is the perfect companion for students on campus and small business owners, developers, and creatives of all kinds depend on Mac to do more than they ever could before.
+
+Woodring: Tim, maybe if we start with you, I think each of the last four years you've exited the December quarter with iPhone demand outpacing supply.
+
+Cook: In terms of exiting the December quarter with demand greater than supply, that's not my recollection that, that happened for all four of the years. Keep in mind that, that's a function of supply and demand, not one side or the other.
+
+Chatterjee: And Tim, I'm going to use your earlier discussion about India as a strong emerging market to sort of ask you about the supply chain planning there in terms of how much of the supply chain planning there that you're doing is more of a reflection of the growth expectations from that market relative to in terms of diversification of the supply chain?
+
+===== RECORD 3 =====
+Company: AbbVie
+Ticker: ABBV
+Sector: Health Care
+Industry: Biotechnology
+Transcript Count: 38
+Filtered Turn Count: 301
+Matched Keywords: bottleneck, capacity, delay, delays, depend on, depends on, distribution, inventory, manufacturing, manufacturing capacity, network, operational, operations, plant, plants, procurement, produced, rely on, shipment, shipments, shipping, supplier, suppliers, supply chain, warehouse, warehousing
+
+Chase: But equally important there have been efforts that we’ve put in place to reduce cost and that could be manufacturing cost, supply chain cost as well as of course to address some of our royalty burden on HUMIRA as well.
+
+Chase: What I can tell you though is it’s not all royalty stack, we have a lot of activities going on right now, to streamline our supply chain and our overall manufacturing base.
+
+Gonzalez: Expansion will be driven primarily by ongoing efficiency programs, optimized manufacturing, commercial infrastructure, administrative costs and general corporate expenses, productivity initiatives and supply chain, and the reduction of HUMIRA royalty expense in 2017 and 2018.
+
+P: With respect to relative advantages of a Q day formulation, I think that again depends on the dose one ultimately selects.
+
+Chase: So that will give you some idea of how that flows in, and then we are always committed to driving more efficient supply chain.
+
+Chase: So, obviously, we'd have to look closely to whether Puerto Rico is considered part of the U.S., which we obviously think it should be, but if that was the case then it would really be no requirement to move our supply chain around drastically.
+
+Gonzalez: As a matter of priority, we continue to closely manage manufacturing and supply chain resources around the world to ensure that our patients receive an uninterrupted supply of their medicines. And we have implemented additional measures at these facilities to ensure the safety of our employees and to protect our supply of API and finish medicines. We have adequate supplies in inventory to meet the expected demand for all AbbVie key medicines including KALETRA and NIMBEX, two therapies that have experienced a significant increase in demand directly related to COVID patient treatment. And we currently do not anticipate any product supply issues. cities most impacted by the pandemic; the procurement and delivery of oxygen concentrators ventilators and personal protective equipment to health care systems in Europe; and various other essential programs including a donation to Feeding America to provide food and household supplies for those most in need including the elderly. We have donated a significant portion of AbbVie's own personal protective equipment supplies including N95 and surgical masks to hospitals near our facilities throughout the U.S. First, patients and pharmacies built up some additional inventory of our medicines to ensure they had adequate supply.
+
+Gonzalez: And two it's not a situation that any of us have ever experienced before meaning that this has both an economic disruption factor built in and it has a supply and demand disruption factor that's built in. Number two, what is it going to be -- what is it going to take in order for the supply side? And when I say supply side what I mean is plastic surgeons, med spas, dermatology offices, which are the primary providers of those procedures. What is it going to take for the supply side to get back to where it was? So, on the supply side, what we're trying to understand here is, what is the intent? The supply side should ramp quickly when the environment allows.
+
+Michael: We now expect LUPRON revenues of approximately $750 million, as we work to resolve a near-term supply issue, which has impacted availability of certain formulations.
+
+Stewart: Now, a lot of it is going to depend on how that CGRP market develops.
+
+Gonzalez: And I'd say the fourth variable, and it's not something that people think about that much, and that is the ability of a biosimilar to be able to supply the U.S. But I think anybody -- any payer that's going to want to convert in any significant way to a biosimilar, they're going to want confidence that they can have a reliability of supply of that biosimilar and we've spent years building the network that we have. And we've never had a problem supplying the U.S.
+
+Michael: I think the pace of that expansion will depend on investment needs as we will always prioritize R&D and SG&A investment to drive long-term growth but that's the best way to think through '24 and then what the operating margin will look like in '25 and beyond.
+
+Hudson: So I would say, late '24, early '25, all depends on the enrollment, which
+
+Stewart: And so when you take a look at those dynamics, we remain quite confident that as we rely on the power of raising the standard of care, that will help us navigate any of these scenarios, whether it's related to obesity or not.
+
+Reents: So this is the US tax, the foreign minimum tax on foreign earnings that the US supplies. That will occur -- the implementation date is a little bit mixed, because it depends on fiscal year-ends of legal entities, but let's call it 2026 is when we can look at that.
+
+Ryan: And that's going to ultimately depend on how over the course of '25, the price volume fully plays out in the marketplace.
+
+Michael: And again, as I mentioned, we haven't completely given up on monotherapy that will depend on dose ranging.
