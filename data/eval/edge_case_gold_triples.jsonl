@@ -1,0 +1,31 @@
+{"source":"case_multi_tier_1","head":"Alpha Mining","head_type":"Supplier","relation":"supplies","tail":"Beta Refining","tail_type":"Supplier"}
+{"source":"case_multi_tier_1","head":"Beta Refining","head_type":"Supplier","relation":"supplies","tail":"Gamma Cathode","tail_type":"Supplier"}
+{"source":"case_multi_tier_1","head":"Gamma Cathode","head_type":"Supplier","relation":"supplies","tail":"Delta Cells","tail_type":"Manufacturer"}
+{"source":"case_multi_tier_2","head":"Orion Electronics","head_type":"Manufacturer","relation":"depends_on","tail":"Nova Components","tail_type":"Supplier"}
+{"source":"case_multi_tier_2","head":"Nova Components","head_type":"Supplier","relation":"depends_on","tail":"Helios Silicon","tail_type":"Supplier"}
+{"source":"case_site_vs_company","head":"NVIDIA","head_type":"Manufacturer","relation":"located_in","tail":"Santa Clara","tail_type":"Region"}
+{"source":"case_site_vs_company","head":"NVIDIA DGX Assembly Plant","head_type":"Manufacturer","relation":"located_in","tail":"Tijuana","tail_type":"Region"}
+{"source":"case_location_hierarchy","head":"Hsinchu","head_type":"Region","relation":"located_in","tail":"Taiwan","tail_type":"Region"}
+{"source":"case_location_hierarchy","head":"Taiwan","head_type":"Region","relation":"located_in","tail":"East Asia","tail_type":"Region"}
+{"source":"case_location_hierarchy","head":"TSMC Fab 18","head_type":"Manufacturer","relation":"located_in","tail":"Hsinchu","tail_type":"Region"}
+{"source":"case_alternative_supplier","head":"Apple","head_type":"Customer","relation":"depends_on","tail":"TSMC","tail_type":"Manufacturer"}
+{"source":"case_alternative_supplier","head":"Samsung Foundry","head_type":"Manufacturer","relation":"alternative_to","tail":"TSMC","tail_type":"Manufacturer"}
+{"source":"case_capacity_lead_time","head":"Contoso Motors","head_type":"Manufacturer","relation":"depends_on","tail":"Apex Battery Cells","tail_type":"Supplier"}
+{"source":"case_capacity_lead_time","head":"Contoso Motors","head_type":"Manufacturer","relation":"affected_by","tail":"Apex capacity shortage","tail_type":"DisruptionEvent"}
+{"source":"case_logistics_chokepoint","head":"NVIDIA","head_type":"Manufacturer","relation":"ships_through","tail":"Port of Kaohsiung","tail_type":"Port"}
+{"source":"case_logistics_chokepoint","head":"Port of Kaohsiung","head_type":"Port","relation":"connects","tail":"Luzon Strait Route","tail_type":"LogisticsRoute"}
+{"source":"case_temporal_change","head":"Acme Auto","head_type":"Manufacturer","relation":"depends_on","tail":"OldChip","tail_type":"Supplier"}
+{"source":"case_temporal_change","head":"Acme Auto","head_type":"Manufacturer","relation":"depends_on","tail":"NewChip","tail_type":"Supplier"}
+{"source":"case_temporal_change","head":"NewChip","head_type":"Supplier","relation":"alternative_to","tail":"OldChip","tail_type":"Supplier"}
+{"source":"case_disambiguation_alias","head":"Taiwan Semiconductor Manufacturing Company","head_type":"Manufacturer","relation":"supplies","tail":"NVIDIA","tail_type":"Manufacturer"}
+{"source":"case_disambiguation_alias","head":"TSMC Arizona","head_type":"Manufacturer","relation":"located_in","tail":"Phoenix","tail_type":"Region"}
+{"source":"case_disruption_location_chain","head":"TSMC","head_type":"Manufacturer","relation":"affected_by","tail":"Taiwan Strait conflict","tail_type":"DisruptionEvent"}
+{"source":"case_disruption_location_chain","head":"Taiwan Strait conflict","head_type":"DisruptionEvent","relation":"located_in","tail":"Taiwan","tail_type":"Region"}
+{"source":"case_disruption_location_chain","head":"TSMC","head_type":"Manufacturer","relation":"located_in","tail":"Taiwan","tail_type":"Region"}
+{"source":"case_disruption_location_chain","head":"NVIDIA","head_type":"Manufacturer","relation":"depends_on","tail":"TSMC","tail_type":"Manufacturer"}
+{"source":"case_port_region_dependency","head":"Port of Shanghai","head_type":"Port","relation":"located_in","tail":"Shanghai","tail_type":"Region"}
+{"source":"case_port_region_dependency","head":"Shanghai","head_type":"Region","relation":"located_in","tail":"China","tail_type":"Region"}
+{"source":"case_port_region_dependency","head":"Pegatron","head_type":"Manufacturer","relation":"ships_through","tail":"Port of Shanghai","tail_type":"Port"}
+{"source":"case_subsupplier_logistics","head":"EcoGraphite","head_type":"Supplier","relation":"supplies","tail":"UniAnode","tail_type":"Supplier"}
+{"source":"case_subsupplier_logistics","head":"UniAnode","head_type":"Supplier","relation":"supplies","tail":"VoltCell","tail_type":"Manufacturer"}
+{"source":"case_subsupplier_logistics","head":"VoltCell","head_type":"Manufacturer","relation":"ships_through","tail":"Port of Busan","tail_type":"Port"}

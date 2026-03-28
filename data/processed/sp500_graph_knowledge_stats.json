@@ -1,0 +1,24 @@
+{
+  "nodes": 7292,
+  "edges": 10820,
+  "node_types": {
+    "Supplier": 4500,
+    "Region": 2006,
+    "Manufacturer": 294,
+    "DisruptionEvent": 113,
+    "Part": 309,
+    "Port": 64,
+    "LogisticsRoute": 6
+  },
+  "relation_types": {
+    "supplies": 10357,
+    "depends_on": 384,
+    "affected_by": 50,
+    "located_in": 23,
+    "sells_to": 2,
+    "alternative_to": 4
+  },
+  "avg_out_degree": 1.48,
+  "is_weakly_connected": false,
+  "weakly_connected_components": 3315
+}

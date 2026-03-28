@@ -193,7 +193,9 @@ class KnowledgeGraphBuilder:
     ):
         self._spacy_model_name    = spacy_model
         self.confidence_threshold = confidence_threshold
-        self.disambiguator        = EntityDisambiguator()
+        # Lazy init so graph construction can still run in restricted environments
+        # where sentence-transformer model downloads are unavailable.
+        self.disambiguator: Optional[EntityDisambiguator] = None
 
         self.documents:           list[dict]   = []
         self.raw_entities:        list[Entity] = []
@@ -445,30 +447,104 @@ class KnowledgeGraphBuilder:
 
         Returns self for method chaining.
         """
-        self.canonical_entities = self.disambiguator.disambiguate(
-            self.raw_entities
-        )
+        try:
+            if self.disambiguator is None:
+                self.disambiguator = EntityDisambiguator()
 
-        updated_triples = []
-        for t in self.triples:
-            canon_head = self.disambiguator.resolve(t.head)
-            canon_tail = self.disambiguator.resolve(t.tail)
-            if canon_head and canon_tail:
-                updated_triples.append(Triple(
-                    head=canon_head,
-                    relation=t.relation,
-                    tail=canon_tail,
-                    confidence=t.confidence,
-                    source_text=t.source_text,
-                ))
+            self.canonical_entities = self.disambiguator.disambiguate(
+                self.raw_entities
+            )
 
-        self.triples = updated_triples
+            updated_triples = []
+            for t in self.triples:
+                canon_head = self.disambiguator.resolve(t.head)
+                canon_tail = self.disambiguator.resolve(t.tail)
+                if canon_head and canon_tail:
+                    updated_triples.append(Triple(
+                        head=canon_head,
+                        relation=t.relation,
+                        tail=canon_tail,
+                        confidence=t.confidence,
+                        source_text=t.source_text,
+                    ))
+
+            self.triples = updated_triples
+            print(
+                f"[Builder] After disambiguation: "
+                f"{len(self.canonical_entities)} canonical entities, "
+                f"{len(self.triples)} triples"
+            )
+            return self
+        except Exception as exc:
+            print(
+                "[Builder] Disambiguation model unavailable; using local "
+                f"string-only fallback. Reason: {exc}"
+            )
+            return self._fallback_disambiguation()
+
+    def _fallback_disambiguation(self) -> "KnowledgeGraphBuilder":
+        """
+        Fallback disambiguation when sentence-transformer model loading fails.
+        Merges only exact-normalized aliases and keeps relation triples intact.
+        """
+        canonical_by_key: dict[tuple[str, str], Entity] = {}
+        plain_key_to_canonical: dict[str, str] = {}
+
+        for ent in self.raw_entities:
+            plain_key = self._entity_key(ent.name)
+            typed_key = (ent.entity_type.value, plain_key)
+
+            if typed_key not in canonical_by_key:
+                canonical_by_key[typed_key] = Entity(
+                    name=ent.name,
+                    entity_type=ent.entity_type,
+                    source_text=ent.source_text,
+                    aliases=list(dict.fromkeys(ent.aliases)),
+                    metadata=dict(ent.metadata),
+                )
+            else:
+                canon = canonical_by_key[typed_key]
+                if ent.name != canon.name and ent.name not in canon.aliases:
+                    canon.aliases.append(ent.name)
+                for alias in ent.aliases:
+                    if alias not in canon.aliases and alias != canon.name:
+                        canon.aliases.append(alias)
+
+            plain_key_to_canonical.setdefault(
+                plain_key,
+                canonical_by_key[typed_key].name,
+            )
+
+        self.canonical_entities = list(canonical_by_key.values())
+
+        self.triples = [
+            Triple(
+                head=plain_key_to_canonical.get(
+                    self._entity_key(t.head), t.head
+                ),
+                relation=t.relation,
+                tail=plain_key_to_canonical.get(
+                    self._entity_key(t.tail), t.tail
+                ),
+                confidence=t.confidence,
+                source_text=t.source_text,
+            )
+            for t in self.triples
+        ]
+
         print(
-            f"[Builder] After disambiguation: "
+            f"[Builder] Fallback disambiguation: "
             f"{len(self.canonical_entities)} canonical entities, "
             f"{len(self.triples)} triples"
         )
         return self
+
+    @staticmethod
+    def _entity_key(name: str) -> str:
+        name = name.lower()
+        name = re.sub(r"[^\w\s]", " ", name)
+        name = re.sub(r"\s+", " ", name).strip()
+        return name
 
     # ------------------------------------------------------------------
     # Step 5 — Graph construction
@@ -612,7 +688,13 @@ class KnowledgeGraphBuilder:
         """Persist the graph to a .gpickle file for use in later modules."""
         path = Path(path)
         path.parent.mkdir(parents=True, exist_ok=True)
-        nx.write_gpickle(self.graph, str(path))
+        # NetworkX 3 removed top-level write_gpickle; use stdlib pickle fallback.
+        try:
+            nx.write_gpickle(self.graph, str(path))  # type: ignore[attr-defined]
+        except AttributeError:
+            import pickle
+            with path.open("wb") as f:
+                pickle.dump(self.graph, f, protocol=pickle.HIGHEST_PROTOCOL)
         print(f"[Builder] Graph saved → {path}")
 
     def save_triples(self, path: str | Path) -> None:

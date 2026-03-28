@@ -1,0 +1,12 @@
+{"source":"case_multi_tier_1","edge_case":"multi_tier_suppliers","text":"Alpha Mining supplies nickel matte to Beta Refining. Beta Refining supplies battery-grade nickel sulfate to Gamma Cathode. Gamma Cathode supplies cathode materials to Delta Cells."}
+{"source":"case_multi_tier_2","edge_case":"multi_tier_suppliers","text":"Orion Electronics depends on Nova Components for power management ICs. Nova Components depends on Helios Silicon for wafers."}
+{"source":"case_site_vs_company","edge_case":"site_vs_company_location","text":"NVIDIA is located in Santa Clara. NVIDIA DGX Assembly Plant is located in Tijuana."}
+{"source":"case_location_hierarchy","edge_case":"location_hierarchy","text":"Hsinchu is located in Taiwan. Taiwan is located in East Asia. TSMC Fab 18 is located in Hsinchu."}
+{"source":"case_alternative_supplier","edge_case":"alternate_suppliers","text":"Apple depends on TSMC for advanced chips. Samsung Foundry is an alternative to TSMC for advanced-node production."}
+{"source":"case_capacity_lead_time","edge_case":"capacity_and_lead_time","text":"Contoso Motors depends on Apex Battery Cells. Contoso Motors is affected by the Apex capacity shortage. The shortage increased battery lead time to 14 weeks."}
+{"source":"case_logistics_chokepoint","edge_case":"logistics_dependencies","text":"NVIDIA ships through Port of Kaohsiung for outbound modules. Port of Kaohsiung connects to the Luzon Strait Route."}
+{"source":"case_temporal_change","edge_case":"temporal_changes","text":"Before 2022, Acme Auto depended on OldChip. Since 2024, Acme Auto depends on NewChip. NewChip is an alternative to OldChip."}
+{"source":"case_disambiguation_alias","edge_case":"entity_disambiguation","text":"Taiwan Semiconductor Manufacturing Company (TSMC) supplies wafers to NVIDIA. TSMC Arizona is located in Phoenix."}
+{"source":"case_disruption_location_chain","edge_case":"disruption_location_propagation","text":"The Taiwan Strait conflict affected TSMC operations. The Taiwan Strait conflict is located in Taiwan. TSMC is located in Taiwan. NVIDIA depends on TSMC."}
+{"source":"case_port_region_dependency","edge_case":"location_hierarchy_and_logistics","text":"Port of Shanghai is located in Shanghai. Shanghai is located in China. Pegatron ships through Port of Shanghai."}
+{"source":"case_subsupplier_logistics","edge_case":"multi_tier_plus_logistics","text":"EcoGraphite supplies anode powder to UniAnode. UniAnode supplies anode material to VoltCell. VoltCell ships through Port of Busan."}

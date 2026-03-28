@@ -1,0 +1,25 @@
+{
+  "nodes": 189,
+  "edges": 264,
+  "node_types": {
+    "Manufacturer": 10,
+    "DisruptionEvent": 36,
+    "Supplier": 26,
+    "Region": 44,
+    "Part": 19,
+    "Customer": 50,
+    "LogisticsRoute": 4
+  },
+  "relation_types": {
+    "affected_by": 36,
+    "depends_on": 27,
+    "located_in": 107,
+    "supplies": 90,
+    "sells_to": 1,
+    "ships_through": 3
+  },
+  "docs": 496,
+  "chunks": 72,
+  "model": "llama-3.3-70b-versatile",
+  "snapshot": "doc_7"
+}

@@ -304,20 +304,38 @@ class DisruptionPropagator:
 
         Steps:
         1. Start with event.ground_zero (explicit list)
-        2. If event.affected_region is set, add all nodes that have a
-           located_in edge pointing to that region (geographic co-location)
-        3. Filter to nodes that actually exist in the graph
+        2. Collect location seeds from:
+           - event.affected_region
+           - any ground-zero node typed Region
+           - any ground-zero node that has located_in -> location edges
+        3. Expand each location seed to all colocated entities via reverse
+           located_in edges, recursively across nested locations
+           (city -> region -> country)
+        4. Filter to nodes that actually exist in the graph
         """
         gz_set = set(event.ground_zero)
+        location_seeds: set[str] = set()
 
         if event.affected_region:
-            region = event.affected_region
-            for node in self.G.nodes():
-                for _, target, data in self.G.out_edges(node, data=True):
-                    if (target == region
-                            and data.get(EDGE_ATTR_RELATION) ==
-                            RelationType.LOCATED_IN.value):
-                        gz_set.add(node)
+            location_seeds.add(event.affected_region)
+
+        # Derive location seeds from ground-zero nodes themselves.
+        for gz_node in list(gz_set):
+            if gz_node not in self.G:
+                continue
+
+            gz_type = str(self.G.nodes[gz_node].get(NODE_ATTR_TYPE, ""))
+            if gz_type == EntityType.REGION.value:
+                location_seeds.add(gz_node)
+
+            for _, target, data in self.G.out_edges(gz_node, data=True):
+                if data.get(EDGE_ATTR_RELATION) == RelationType.LOCATED_IN.value:
+                    location_seeds.add(target)
+
+        # Expand from location seeds to all colocated entities and nested
+        # location hierarchy nodes.
+        if location_seeds:
+            gz_set |= self._expand_location_ground_zero(location_seeds)
 
         # Filter to nodes that exist in graph
         valid = [n for n in gz_set if n in self.G]
@@ -326,6 +344,40 @@ class DisruptionPropagator:
             print(f"[Propagator] Warning: ground-zero nodes not in graph: {missing}")
 
         return valid
+
+    def _expand_location_ground_zero(self, location_seeds: set[str]) -> set[str]:
+        """
+        Expand location seeds through reverse located_in links.
+
+        Example:
+          If seed is "Taiwan", include nodes with node -> located_in -> Taiwan.
+          If a location node (e.g., "Hsinchu") is included and itself has
+          Hsinchu -> located_in -> Taiwan, also expand from Hsinchu.
+        """
+        expanded: set[str] = set()
+        queue = list(location_seeds)
+        seen_locations: set[str] = set()
+
+        while queue:
+            location = queue.pop(0)
+            if location in seen_locations:
+                continue
+            seen_locations.add(location)
+
+            if location in self.G:
+                expanded.add(location)
+
+            # Any node with node -> located_in -> location is colocated.
+            for source, _, data in self.G.in_edges(location, data=True):
+                if data.get(EDGE_ATTR_RELATION) != RelationType.LOCATED_IN.value:
+                    continue
+
+                expanded.add(source)
+                source_type = str(self.G.nodes[source].get(NODE_ATTR_TYPE, ""))
+                if source_type == EntityType.REGION.value:
+                    queue.append(source)
+
+        return expanded
 
     # ------------------------------------------------------------------
     # Core weighted BFS
