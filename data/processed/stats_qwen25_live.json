@@ -1,0 +1,26 @@
+{
+  "nodes": 47,
+  "edges": 53,
+  "node_types": {
+    "Manufacturer": 9,
+    "Supplier": 8,
+    "Customer": 7,
+    "Port": 6,
+    "Region": 12,
+    "DisruptionEvent": 4,
+    "LogisticsRoute": 1
+  },
+  "relation_types": {
+    "depends_on": 7,
+    "sells_to": 2,
+    "ships_through": 5,
+    "supplies": 10,
+    "located_in": 16,
+    "alternative_to": 6,
+    "affected_by": 7
+  },
+  "docs": 10,
+  "chunks": 10,
+  "model": "qwen2.5:32b",
+  "snapshot": "final"
+}

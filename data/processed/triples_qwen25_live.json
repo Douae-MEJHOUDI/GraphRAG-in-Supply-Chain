@@ -1,0 +1,640 @@
+[
+  {
+    "head": "Apple",
+    "head_type": "Manufacturer",
+    "relation": "depends_on",
+    "tail": "TSMC",
+    "tail_type": "Supplier",
+    "confidence": 1.0,
+    "evidence": "Apple depends on TSMC for A-series and M-series chips",
+    "source": "oem_profile_apple",
+    "chunk_id": 1,
+    "option_group_id": "depends_on:Apple:GlobalFoundries|Samsung Foundry|TSMC",
+    "selection_mode": "OR",
+    "alternatives": [
+      "GlobalFoundries",
+      "Samsung Foundry"
+    ]
+  },
+  {
+    "head": "Apple",
+    "head_type": "Manufacturer",
+    "relation": "sells_to",
+    "tail": "customers worldwide",
+    "tail_type": "Customer",
+    "confidence": 1.0,
+    "evidence": "Apple sells consumer devices to customers worldwide",
+    "source": "oem_profile_apple",
+    "chunk_id": 1
+  },
+  {
+    "head": "Apple",
+    "head_type": "Manufacturer",
+    "relation": "ships_through",
+    "tail": "Port of Los Angeles",
+    "tail_type": "Port",
+    "confidence": 1.0,
+    "evidence": "Apple ships products through the Port of Shanghai and the Port of Los Angeles",
+    "source": "oem_profile_apple",
+    "chunk_id": 1
+  },
+  {
+    "head": "Apple",
+    "head_type": "Manufacturer",
+    "relation": "ships_through",
+    "tail": "Port of Shanghai",
+    "tail_type": "Port",
+    "confidence": 1.0,
+    "evidence": "Apple ships products through the Port of Shanghai and the Port of Los Angeles",
+    "source": "oem_profile_apple",
+    "chunk_id": 1
+  },
+  {
+    "head": "Australia",
+    "head_type": "Region",
+    "relation": "located_in",
+    "tail": "Pilbara Minerals",
+    "tail_type": "Supplier",
+    "confidence": 1.0,
+    "evidence": "Pilbara Minerals, located in Australia",
+    "source": "commodity_report_lithium",
+    "chunk_id": 1
+  },
+  {
+    "head": "China",
+    "head_type": "Region",
+    "relation": "located_in",
+    "tail": "CATL",
+    "tail_type": "Manufacturer",
+    "confidence": 1.0,
+    "evidence": "CATL, headquartered in China",
+    "source": "supplier_profile_catl",
+    "chunk_id": 1
+  },
+  {
+    "head": "China",
+    "head_type": "Region",
+    "relation": "located_in",
+    "tail": "Ganfeng Lithium",
+    "tail_type": "Supplier",
+    "confidence": 1.0,
+    "evidence": "Ganfeng Lithium, located in China",
+    "source": "supplier_profile_catl",
+    "chunk_id": 1
+  },
+  {
+    "head": "Congo Cobalt Strike",
+    "head_type": "DisruptionEvent",
+    "relation": "affected_by",
+    "tail": "Glencore",
+    "tail_type": "Supplier",
+    "confidence": 1.0,
+    "evidence": "Glencore was affected by the Congo Cobalt Strike",
+    "source": "commodity_report_cobalt",
+    "chunk_id": 1
+  },
+  {
+    "head": "Congo Cobalt Strike",
+    "head_type": "DisruptionEvent",
+    "relation": "affected_by",
+    "tail": "Katanga Mining Complex",
+    "tail_type": "Supplier",
+    "confidence": 1.0,
+    "evidence": "The Congo Cobalt Strike of 2023 affected production at the Katanga Mining Complex",
+    "source": "commodity_report_cobalt",
+    "chunk_id": 1
+  },
+  {
+    "head": "Democratic Republic of Congo",
+    "head_type": "Region",
+    "relation": "located_in",
+    "tail": "Katanga Mining Complex",
+    "tail_type": "Supplier",
+    "confidence": 1.0,
+    "evidence": "Glencore sources cobalt from the Katanga Mining Complex in the Democratic Republic of Congo",
+    "source": "commodity_report_cobalt",
+    "chunk_id": 1
+  },
+  {
+    "head": "Ganfeng Lithium",
+    "head_type": "Supplier",
+    "relation": "alternative_to",
+    "tail": "Pilbara Minerals",
+    "tail_type": "Supplier",
+    "confidence": 1.0,
+    "evidence": "Pilbara Minerals, located in Australia, is an alternative to Ganfeng Lithium for hard-rock lithium spodumene",
+    "source": "commodity_report_lithium",
+    "chunk_id": 1
+  },
+  {
+    "head": "Ganfeng Lithium",
+    "head_type": "Supplier",
+    "relation": "depends_on",
+    "tail": "Atacama Desert",
+    "tail_type": "Region",
+    "confidence": 1.0,
+    "evidence": "Ganfeng Lithium sources lithium from the Atacama Desert in Chile",
+    "source": "commodity_report_lithium",
+    "chunk_id": 1
+  },
+  {
+    "head": "Ganfeng Lithium",
+    "head_type": "Supplier",
+    "relation": "supplies",
+    "tail": "BMW",
+    "tail_type": "Customer",
+    "confidence": 1.0,
+    "evidence": "Ganfeng Lithium supplies lithium hydroxide to BMW, Tesla, and LG Energy",
+    "source": "commodity_report_lithium",
+    "chunk_id": 1,
+    "option_group_id": "supplies:BMW:Ganfeng Lithium|Pilbara Minerals",
+    "selection_mode": "OR",
+    "alternatives": [
+      "Pilbara Minerals"
+    ]
+  },
+  {
+    "head": "Ganfeng Lithium",
+    "head_type": "Supplier",
+    "relation": "supplies",
+    "tail": "LG Energy",
+    "tail_type": "Customer",
+    "confidence": 1.0,
+    "evidence": "Ganfeng Lithium supplies lithium hydroxide to BMW, Tesla, and LG Energy",
+    "source": "commodity_report_lithium",
+    "chunk_id": 1,
+    "option_group_id": "supplies:LG Energy:Ganfeng Lithium|Pilbara Minerals",
+    "selection_mode": "OR",
+    "alternatives": [
+      "Pilbara Minerals"
+    ]
+  },
+  {
+    "head": "Ganfeng Lithium",
+    "head_type": "Supplier",
+    "relation": "supplies",
+    "tail": "Tesla",
+    "tail_type": "Customer",
+    "confidence": 1.0,
+    "evidence": "Ganfeng Lithium supplies lithium hydroxide to BMW, Tesla, and LG Energy",
+    "source": "commodity_report_lithium",
+    "chunk_id": 1,
+    "option_group_id": "supplies:Tesla:Ganfeng Lithium|Pilbara Minerals",
+    "selection_mode": "OR",
+    "alternatives": [
+      "Pilbara Minerals"
+    ]
+  },
+  {
+    "head": "Glencore",
+    "head_type": "Supplier",
+    "relation": "supplies",
+    "tail": "CATL",
+    "tail_type": "Manufacturer",
+    "confidence": 1.0,
+    "evidence": "Glencore supplies cobalt to battery manufacturers including CATL and Panasonic",
+    "source": "commodity_report_cobalt",
+    "chunk_id": 1
+  },
+  {
+    "head": "Glencore",
+    "head_type": "Supplier",
+    "relation": "supplies",
+    "tail": "Panasonic",
+    "tail_type": "Manufacturer",
+    "confidence": 1.0,
+    "evidence": "Glencore supplies cobalt to battery manufacturers including CATL and Panasonic",
+    "source": "commodity_report_cobalt",
+    "chunk_id": 1
+  },
+  {
+    "head": "GlobalFoundries",
+    "head_type": "Manufacturer",
+    "relation": "alternative_to",
+    "tail": "TSMC",
+    "tail_type": "Manufacturer",
+    "confidence": 1.0,
+    "evidence": "GlobalFoundries, headquartered in the United States, is an alternative to TSMC for mature-node chip production",
+    "source": "risk_report_taiwan_semiconductor",
+    "chunk_id": 1
+  },
+  {
+    "head": "Japan",
+    "head_type": "Region",
+    "relation": "located_in",
+    "tail": "Panasonic Energy",
+    "tail_type": "Manufacturer",
+    "confidence": 1.0,
+    "evidence": "Panasonic Energy, based in Japan",
+    "source": "supplier_profile_panasonic",
+    "chunk_id": 1
+  },
+  {
+    "head": "Jiangxi",
+    "head_type": "Region",
+    "relation": "located_in",
+    "tail": "Ganfeng Lithium",
+    "tail_type": "Supplier",
+    "confidence": 1.0,
+    "evidence": "Ganfeng Lithium is headquartered in Jiangxi, China",
+    "source": "commodity_report_lithium",
+    "chunk_id": 1
+  },
+  {
+    "head": "Katanga Mining Complex",
+    "head_type": "Supplier",
+    "relation": "supplies",
+    "tail": "Glencore",
+    "tail_type": "Supplier",
+    "confidence": 1.0,
+    "evidence": "Glencore sources cobalt from the Katanga Mining Complex in the Democratic Republic of Congo",
+    "source": "commodity_report_cobalt",
+    "chunk_id": 1
+  },
+  {
+    "head": "Maersk",
+    "head_type": "Supplier",
+    "relation": "ships_through",
+    "tail": "Suez Canal Corridor",
+    "tail_type": "LogisticsRoute",
+    "confidence": 1.0,
+    "evidence": "Maersk, headquartered in Denmark, routes container ships through the Suez Canal Corridor",
+    "source": "logistics_report_suez",
+    "chunk_id": 1
+  },
+  {
+    "head": "Netherlands",
+    "head_type": "Region",
+    "relation": "located_in",
+    "tail": "ASML",
+    "tail_type": "Supplier",
+    "confidence": 1.0,
+    "evidence": "ASML is based in the Netherlands",
+    "source": "supplier_profile_tsmc",
+    "chunk_id": 1
+  },
+  {
+    "head": "Panasonic Energy",
+    "head_type": "Manufacturer",
+    "relation": "alternative_to",
+    "tail": "POSCO",
+    "tail_type": "Supplier",
+    "confidence": 1.0,
+    "evidence": "POSCO, located in South Korea, is an alternative to Panasonic for battery-grade nickel supply",
+    "source": "supplier_profile_panasonic",
+    "chunk_id": 1
+  },
+  {
+    "head": "Panasonic Energy",
+    "head_type": "Manufacturer",
+    "relation": "depends_on",
+    "tail": "Democratic Republic of Congo",
+    "tail_type": "Region",
+    "confidence": 1.0,
+    "evidence": "Panasonic depends on cobalt sourced from the Democratic Republic of Congo",
+    "source": "supplier_profile_panasonic",
+    "chunk_id": 1
+  },
+  {
+    "head": "Panasonic Energy",
+    "head_type": "Manufacturer",
+    "relation": "supplies",
+    "tail": "Tesla",
+    "tail_type": "Customer",
+    "confidence": 1.0,
+    "evidence": "Panasonic Energy supplies battery cells to Tesla",
+    "source": "supplier_profile_panasonic",
+    "chunk_id": 1,
+    "option_group_id": "supplies:Tesla:Panasonic Energy|POSCO",
+    "selection_mode": "OR",
+    "alternatives": [
+      "POSCO"
+    ]
+  },
+  {
+    "head": "Port of Ningbo",
+    "head_type": "Port",
+    "relation": "alternative_to",
+    "tail": "Port of Shanghai",
+    "tail_type": "Port",
+    "confidence": 1.0,
+    "evidence": "The Port of Ningbo is an alternative to the Port of Shanghai for exports from eastern China",
+    "source": "disruption_report_shanghai_lockdown",
+    "chunk_id": 1
+  },
+  {
+    "head": "Port of Singapore",
+    "head_type": "Port",
+    "relation": "alternative_to",
+    "tail": "Suez Canal Corridor",
+    "tail_type": "LogisticsRoute",
+    "confidence": 1.0,
+    "evidence": "The Port of Singapore serves as an alternative to the Suez Canal Corridor for Asian-European trade",
+    "source": "logistics_report_suez",
+    "chunk_id": 1
+  },
+  {
+    "head": "Red Sea Shipping Disruption",
+    "head_type": "DisruptionEvent",
+    "relation": "affected_by",
+    "tail": "Maersk",
+    "tail_type": "Supplier",
+    "confidence": 1.0,
+    "evidence": "Maersk was affected by the Red Sea Shipping Disruption",
+    "source": "logistics_report_suez",
+    "chunk_id": 1
+  },
+  {
+    "head": "Red Sea Shipping Disruption",
+    "head_type": "DisruptionEvent",
+    "relation": "affected_by",
+    "tail": "Port of Rotterdam",
+    "tail_type": "Port",
+    "confidence": 1.0,
+    "evidence": "The Port of Rotterdam was affected by the Red Sea Shipping Disruption",
+    "source": "logistics_report_suez",
+    "chunk_id": 1
+  },
+  {
+    "head": "Red Sea Shipping Disruption",
+    "head_type": "DisruptionEvent",
+    "relation": "located_in",
+    "tail": "Suez Canal Corridor",
+    "tail_type": "LogisticsRoute",
+    "confidence": 1.0,
+    "evidence": "The Red Sea Shipping Disruption of 2024 forced many carriers to reroute around the Cape of Good Hope",
+    "source": "logistics_report_suez",
+    "chunk_id": 1
+  },
+  {
+    "head": "Samsung Foundry",
+    "head_type": "Manufacturer",
+    "relation": "alternative_to",
+    "tail": "TSMC",
+    "tail_type": "Manufacturer",
+    "confidence": 1.0,
+    "evidence": "Samsung Foundry, located in South Korea, is also an alternative to TSMC for advanced logic chips",
+    "source": "risk_report_taiwan_semiconductor",
+    "chunk_id": 1
+  },
+  {
+    "head": "Shanghai Lockdown",
+    "head_type": "DisruptionEvent",
+    "relation": "affected_by",
+    "tail": "CATL",
+    "tail_type": "Manufacturer",
+    "confidence": 1.0,
+    "evidence": "CATL was affected by the Shanghai Lockdown due to its manufacturing facilities located in China",
+    "source": "disruption_report_shanghai_lockdown",
+    "chunk_id": 1
+  },
+  {
+    "head": "Shanghai Lockdown",
+    "head_type": "DisruptionEvent",
+    "relation": "affected_by",
+    "tail": "Port of Shanghai",
+    "tail_type": "Port",
+    "confidence": 1.0,
+    "evidence": "The Port of Shanghai was affected by the Shanghai Lockdown",
+    "source": "disruption_report_shanghai_lockdown",
+    "chunk_id": 1
+  },
+  {
+    "head": "Shanghai Lockdown",
+    "head_type": "DisruptionEvent",
+    "relation": "located_in",
+    "tail": "Shanghai",
+    "tail_type": "Region",
+    "confidence": 1.0,
+    "evidence": "The Shanghai Lockdown of 2022 caused severe supply chain disruptions across the global electronics industry",
+    "source": "disruption_report_shanghai_lockdown",
+    "chunk_id": 1
+  },
+  {
+    "head": "South Korea",
+    "head_type": "Region",
+    "relation": "located_in",
+    "tail": "POSCO",
+    "tail_type": "Supplier",
+    "confidence": 1.0,
+    "evidence": "POSCO, located in South Korea",
+    "source": "supplier_profile_panasonic",
+    "chunk_id": 1
+  },
+  {
+    "head": "South Korea",
+    "head_type": "Region",
+    "relation": "located_in",
+    "tail": "Samsung Foundry",
+    "tail_type": "Manufacturer",
+    "confidence": 1.0,
+    "evidence": "Samsung Foundry, located in South Korea",
+    "source": "risk_report_taiwan_semiconductor",
+    "chunk_id": 1
+  },
+  {
+    "head": "Taiwan",
+    "head_type": "Region",
+    "relation": "located_in",
+    "tail": "Foxconn",
+    "tail_type": "Manufacturer",
+    "confidence": 1.0,
+    "evidence": "Foxconn, located in Taiwan, manufactures iPhones for Apple",
+    "source": "oem_profile_apple",
+    "chunk_id": 1
+  },
+  {
+    "head": "Taiwan",
+    "head_type": "Region",
+    "relation": "located_in",
+    "tail": "TSMC",
+    "tail_type": "Supplier",
+    "confidence": 1.0,
+    "evidence": "TSMC, headquartered in Taiwan",
+    "source": "supplier_profile_tsmc",
+    "chunk_id": 1
+  },
+  {
+    "head": "Taiwan Earthquake",
+    "head_type": "DisruptionEvent",
+    "relation": "affected_by",
+    "tail": "TSMC",
+    "tail_type": "Manufacturer",
+    "confidence": 1.0,
+    "evidence": "TSMC was affected by the Taiwan Earthquake",
+    "source": "risk_report_taiwan_semiconductor",
+    "chunk_id": 1
+  },
+  {
+    "head": "Taiwan Earthquake",
+    "head_type": "DisruptionEvent",
+    "relation": "located_in",
+    "tail": "Taiwan",
+    "tail_type": "Region",
+    "confidence": 1.0,
+    "evidence": "The 2024 Taiwan Earthquake severely affected semiconductor production in Taiwan",
+    "source": "risk_report_taiwan_semiconductor",
+    "chunk_id": 1
+  },
+  {
+    "head": "Taiwan Semiconductor Manufacturing",
+    "head_type": "Manufacturer",
+    "relation": "depends_on",
+    "tail": "ASML",
+    "tail_type": "Supplier",
+    "confidence": 1.0,
+    "evidence": "Taiwan Semiconductor Manufacturing depends on ASML for extreme ultraviolet lithography machines",
+    "source": "supplier_profile_tsmc",
+    "chunk_id": 1
+  },
+  {
+    "head": "Tesla",
+    "head_type": "Manufacturer",
+    "relation": "depends_on",
+    "tail": "CATL",
+    "tail_type": "Supplier",
+    "confidence": 1.0,
+    "evidence": "Tesla depends on CATL and Panasonic Energy for battery cells",
+    "source": "oem_profile_tesla",
+    "chunk_id": 1
+  },
+  {
+    "head": "Tesla",
+    "head_type": "Manufacturer",
+    "relation": "depends_on",
+    "tail": "Panasonic Energy",
+    "tail_type": "Supplier",
+    "confidence": 1.0,
+    "evidence": "Tesla depends on CATL and Panasonic Energy for battery cells",
+    "source": "oem_profile_tesla",
+    "chunk_id": 1,
+    "option_group_id": "depends_on:Tesla:Panasonic Energy|POSCO",
+    "selection_mode": "OR",
+    "alternatives": [
+      "POSCO"
+    ]
+  },
+  {
+    "head": "Tesla",
+    "head_type": "Manufacturer",
+    "relation": "depends_on",
+    "tail": "TSMC",
+    "tail_type": "Supplier",
+    "confidence": 1.0,
+    "evidence": "Tesla depends on TSMC for automotive-grade chips",
+    "source": "oem_profile_tesla",
+    "chunk_id": 1,
+    "option_group_id": "depends_on:Tesla:GlobalFoundries|Samsung Foundry|TSMC",
+    "selection_mode": "OR",
+    "alternatives": [
+      "GlobalFoundries",
+      "Samsung Foundry"
+    ]
+  },
+  {
+    "head": "Tesla",
+    "head_type": "Manufacturer",
+    "relation": "sells_to",
+    "tail": "customers",
+    "tail_type": "Customer",
+    "confidence": 1.0,
+    "evidence": "Tesla sells electric vehicles to customers across North America and Europe",
+    "source": "oem_profile_tesla",
+    "chunk_id": 1
+  },
+  {
+    "head": "Tesla",
+    "head_type": "Manufacturer",
+    "relation": "ships_through",
+    "tail": "Port of Los Angeles",
+    "tail_type": "Port",
+    "confidence": 1.0,
+    "evidence": "Tesla ships finished vehicles through the Port of Los Angeles",
+    "source": "oem_profile_tesla",
+    "chunk_id": 1
+  },
+  {
+    "head": "Texas",
+    "head_type": "Region",
+    "relation": "located_in",
+    "tail": "Gigafactory",
+    "tail_type": "Manufacturer",
+    "confidence": 1.0,
+    "evidence": "Tesla manufactures electric vehicles at its Gigafactory in Texas",
+    "source": "oem_profile_tesla",
+    "chunk_id": 1
+  },
+  {
+    "head": "TSMC",
+    "head_type": "Manufacturer",
+    "relation": "ships_through",
+    "tail": "Port of Kaohsiung",
+    "tail_type": "Port",
+    "confidence": 1.0,
+    "evidence": "TSMC ships through the Port of Kaohsiung to reach customers in the United States and Europe",
+    "source": "supplier_profile_tsmc",
+    "chunk_id": 1
+  },
+  {
+    "head": "TSMC",
+    "head_type": "Supplier",
+    "relation": "supplies",
+    "tail": "AMD",
+    "tail_type": "Customer",
+    "confidence": 1.0,
+    "evidence": "TSMC supplies advanced chips to Apple, NVIDIA, and AMD",
+    "source": "supplier_profile_tsmc",
+    "chunk_id": 1,
+    "option_group_id": "supplies:AMD:GlobalFoundries|Samsung Foundry|TSMC",
+    "selection_mode": "OR",
+    "alternatives": [
+      "GlobalFoundries",
+      "Samsung Foundry"
+    ]
+  },
+  {
+    "head": "TSMC",
+    "head_type": "Supplier",
+    "relation": "supplies",
+    "tail": "Apple",
+    "tail_type": "Customer",
+    "confidence": 1.0,
+    "evidence": "TSMC supplies advanced chips to Apple, NVIDIA, and AMD",
+    "source": "supplier_profile_tsmc",
+    "chunk_id": 1,
+    "option_group_id": "supplies:Apple:GlobalFoundries|Samsung Foundry|TSMC",
+    "selection_mode": "OR",
+    "alternatives": [
+      "GlobalFoundries",
+      "Samsung Foundry"
+    ]
+  },
+  {
+    "head": "TSMC",
+    "head_type": "Supplier",
+    "relation": "supplies",
+    "tail": "NVIDIA",
+    "tail_type": "Customer",
+    "confidence": 1.0,
+    "evidence": "TSMC supplies advanced chips to Apple, NVIDIA, and AMD",
+    "source": "supplier_profile_tsmc",
+    "chunk_id": 1,
+    "option_group_id": "supplies:NVIDIA:GlobalFoundries|Samsung Foundry|TSMC",
+    "selection_mode": "OR",
+    "alternatives": [
+      "GlobalFoundries",
+      "Samsung Foundry"
+    ]
+  },
+  {
+    "head": "United States",
+    "head_type": "Region",
+    "relation": "located_in",
+    "tail": "GlobalFoundries",
+    "tail_type": "Manufacturer",
+    "confidence": 1.0,
+    "evidence": "GlobalFoundries, headquartered in the United States",
+    "source": "risk_report_taiwan_semiconductor",
+    "chunk_id": 1
+  }
+]
