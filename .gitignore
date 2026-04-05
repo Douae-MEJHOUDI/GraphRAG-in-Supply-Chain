@@ -42,6 +42,7 @@ data/raw/*.jsonl
 data/raw/*.parquet
 
 # My Branch LOL
+.codex
 
 OLD/
 # Secondary folder

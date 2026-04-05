@@ -237,13 +237,16 @@ class CommunitySummarizer:
             }
             for c in self.communities
         ]
-        path.write_text(json.dumps(payload, indent=2, ensure_ascii=False))
+        path.write_text(
+            json.dumps(payload, indent=2, ensure_ascii=False),
+            encoding="utf-8",
+        )
         print(f"[Community] Communities saved → {path}")
 
     def load(self, path: str | Path) -> None:
         """Load previously saved communities from JSON."""
         path = Path(path)
-        data = json.loads(path.read_text())
+        data = json.loads(path.read_text(encoding="utf-8"))
         self.communities = [
             Community(
                 community_id=d["community_id"],

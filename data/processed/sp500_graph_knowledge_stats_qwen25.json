@@ -1,28 +1,28 @@
 {
-  "nodes": 3359,
-  "edges": 4408,
+  "nodes": 7387,
+  "edges": 10484,
   "node_types": {
-    "DisruptionEvent": 653,
-    "Supplier": 513,
-    "Customer": 402,
-    "Region": 457,
-    "Part": 850,
-    "Manufacturer": 383,
-    "LogisticsRoute": 80,
-    "Port": 21
+    "DisruptionEvent": 1436,
+    "Supplier": 1201,
+    "Customer": 951,
+    "Region": 809,
+    "Part": 1861,
+    "Manufacturer": 924,
+    "LogisticsRoute": 159,
+    "Port": 46
   },
   "relation_types": {
-    "affected_by": 973,
-    "located_in": 1577,
-    "depends_on": 1011,
-    "ships_through": 84,
-    "supplies": 729,
-    "alternative_to": 13,
-    "sells_to": 16,
-    "connects": 5
+    "affected_by": 2574,
+    "located_in": 3473,
+    "depends_on": 2408,
+    "ships_through": 192,
+    "supplies": 1722,
+    "sells_to": 61,
+    "alternative_to": 44,
+    "connects": 10
   },
   "docs": 496,
-  "chunks": 2368,
+  "chunks": 5424,
   "model": "qwen2.5:32b",
-  "snapshot": "doc_161"
+  "snapshot": "doc_350"
 }

@@ -91,7 +91,10 @@ class AblationResult:
                 "report":  self.graphrag_sim.report.full_text[:500],
             },
         }
-        path.write_text(json.dumps(payload, indent=2, ensure_ascii=False))
+        path.write_text(
+            json.dumps(payload, indent=2, ensure_ascii=False),
+            encoding="utf-8",
+        )
         print(f"[Evaluator] Ablation result saved → {path}")
 
 

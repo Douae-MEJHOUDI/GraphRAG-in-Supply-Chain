@@ -1,0 +1,128 @@
+{
+  "suite_name": "graphrag_supply_chain_benchmark_v1",
+  "description": "Benchmark prompts for Baseline LLM vs Vector RAG vs GraphRAG+Simulation on current graph artifacts.",
+  "system_prompt": "You are a supply chain risk analyst. Use only the provided graph context. Do not invent entities, edges, or events. If evidence is missing, say so explicitly. Return strict JSON only with keys: query_type, summary, top_entities, evidence_paths, critical_dependencies, alternatives, data_gaps, confidence.",
+  "output_schema_notes": {
+    "query_type": "local or global",
+    "top_entities": "List of objects: {name, risk_score_0_to_1, reason}",
+    "evidence_paths": "List of paths, each path is a list of triplets: [head, relation, tail]",
+    "critical_dependencies": "List of objects: {entity, depends_on, why_critical}",
+    "alternatives": "List of objects: {entity, alternative, tradeoff_or_limit}",
+    "data_gaps": "List missing facts needed for higher-confidence answer",
+    "confidence": "0 to 1 confidence score"
+  },
+  "prompts": [
+    {
+      "id": "L01",
+      "category": "local_multi_hop",
+      "difficulty": "hard",
+      "expected_query_type": "local",
+      "query": "Which manufacturers have the strongest 2-hop or 3-hop dependency on China-linked semiconductor suppliers, and where do Boeing and HPQ rank among them?"
+    },
+    {
+      "id": "L02",
+      "category": "local_exposure",
+      "difficulty": "medium",
+      "expected_query_type": "local",
+      "query": "How exposed is HPQ to supply chain disruptions in China? Give the top dependency paths and identify any single points of failure."
+    },
+    {
+      "id": "L03",
+      "category": "local_comparison",
+      "difficulty": "hard",
+      "expected_query_type": "local",
+      "query": "Compare Boeing, FMC, and FSLR on disruption exposure from chip shortages, supply constraints, and China-related shutdowns. Rank highest to lowest risk with graph evidence."
+    },
+    {
+      "id": "L04",
+      "category": "local_ports",
+      "difficulty": "medium",
+      "expected_query_type": "local",
+      "query": "For nodes connected to Shanghai or port-related disruption nodes, which manufacturers and customers become highest risk if Shanghai port throughput drops by 40 percent?"
+    },
+    {
+      "id": "L05",
+      "category": "local_alternatives",
+      "difficulty": "hard",
+      "expected_query_type": "local",
+      "query": "Identify critical suppliers that currently look irreplaceable for semiconductor-related chains. For each, list any alternative_to relationships and explain residual risk."
+    },
+    {
+      "id": "L06",
+      "category": "local_customer_impact",
+      "difficulty": "medium",
+      "expected_query_type": "local",
+      "query": "Which customer-side entities are most at risk when both supply_chain_disruptions and COVID-19 nodes are active in China? Provide ranked entities and path evidence."
+    },
+    {
+      "id": "G01",
+      "category": "global_systemic",
+      "difficulty": "hard",
+      "expected_query_type": "global",
+      "query": "What is the overall portfolio exposure to COVID-19, supply_chain_disruptions, and war in Ukraine across China, United States, Europe, and North America?"
+    },
+    {
+      "id": "G02",
+      "category": "global_concentration",
+      "difficulty": "hard",
+      "expected_query_type": "global",
+      "query": "Which regions create the highest concentration risk for the graph as a whole, and which hubs amplify cascades the most?"
+    },
+    {
+      "id": "G03",
+      "category": "global_disruption_clusters",
+      "difficulty": "medium",
+      "expected_query_type": "global",
+      "query": "Summarize the top disruption communities and explain how they connect to Supplier, Manufacturer, and Customer clusters."
+    },
+    {
+      "id": "G04",
+      "category": "global_resilience",
+      "difficulty": "hard",
+      "expected_query_type": "global",
+      "query": "If we prioritize resilience spending this quarter, which five entities or regions should be addressed first to reduce network-wide downstream risk?"
+    },
+    {
+      "id": "W01",
+      "category": "what_if_shanghai",
+      "difficulty": "hard",
+      "expected_query_type": "local",
+      "query": "What-if scenario: Shanghai disruption plus lockdowns in China recur for 8 weeks. Which entities turn critical first, and through what dependency paths?"
+    },
+    {
+      "id": "W02",
+      "category": "what_if_semiconductor",
+      "difficulty": "hard",
+      "expected_query_type": "local",
+      "query": "What happens to semiconductor-related supply if chip shortage nodes intensify while Chinese silicon industry supply falls? Show top affected manufacturers and alternatives."
+    },
+    {
+      "id": "W03",
+      "category": "what_if_geopolitics",
+      "difficulty": "hard",
+      "expected_query_type": "global",
+      "query": "What-if scenario: sanctions and war in Ukraine-related disruptions increase while energy costs rise. How does risk redistribution change across regions and key suppliers?"
+    },
+    {
+      "id": "W04",
+      "category": "what_if_covid",
+      "difficulty": "medium",
+      "expected_query_type": "global",
+      "query": "What-if scenario: a new COVID wave reactivates COVID-19 and lockdown-related disruption nodes in Asia. Which supply chains become most fragile?"
+    },
+    {
+      "id": "M01",
+      "category": "mitigation_plan",
+      "difficulty": "hard",
+      "expected_query_type": "global",
+      "query": "Propose a mitigation plan with immediate, 30-day, and 90-day actions for top disruption-exposed entities. Tie every action to explicit graph evidence and alternatives."
+    },
+    {
+      "id": "M02",
+      "category": "executive_brief",
+      "difficulty": "medium",
+      "expected_query_type": "global",
+      "query": "Create an executive risk brief: top 10 entities at risk, top 5 causal paths, top 5 mitigations, and unresolved data gaps that block confident decisions."
+    }
+  ]
+}

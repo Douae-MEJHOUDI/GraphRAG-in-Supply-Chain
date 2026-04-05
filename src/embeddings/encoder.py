@@ -190,7 +190,10 @@ class NodeEncoder:
         path.parent.mkdir(parents=True, exist_ok=True)
         faiss.write_index(self._index, str(path))
         names_path = path.with_suffix(path.suffix + ".names")
-        names_path.write_text(json.dumps(self._node_names, ensure_ascii=False))
+        names_path.write_text(
+            json.dumps(self._node_names, ensure_ascii=False),
+            encoding="utf-8",
+        )
         print(f"[Encoder] Index saved → {path}")
         print(f"[Encoder] Node names saved → {names_path}")
 
@@ -205,7 +208,7 @@ class NodeEncoder:
             raise FileNotFoundError(f"FAISS index not found: {path}")
         self._index      = faiss.read_index(str(path))
         names_path       = path.with_suffix(path.suffix + ".names")
-        self._node_names = json.loads(names_path.read_text())
+        self._node_names = json.loads(names_path.read_text(encoding="utf-8"))
         print(f"[Encoder] Loaded index: {self._index.ntotal} vectors from {path}")
 
     # ------------------------------------------------------------------

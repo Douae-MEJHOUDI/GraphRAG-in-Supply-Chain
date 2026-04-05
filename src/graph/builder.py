@@ -711,7 +711,10 @@ class KnowledgeGraphBuilder:
             }
             for t in self.triples
         ]
-        path.write_text(json.dumps(payload, indent=2, ensure_ascii=False))
+        path.write_text(
+            json.dumps(payload, indent=2, ensure_ascii=False),
+            encoding="utf-8",
+        )
         print(f"[Builder] Triples saved → {path}")
 
     def save_entities(self, path: str | Path) -> None:
@@ -727,7 +730,10 @@ class KnowledgeGraphBuilder:
             }
             for e in self.canonical_entities
         ]
-        path.write_text(json.dumps(payload, indent=2, ensure_ascii=False))
+        path.write_text(
+            json.dumps(payload, indent=2, ensure_ascii=False),
+            encoding="utf-8",
+        )
         print(f"[Builder] Entities saved → {path}")
 
     # ------------------------------------------------------------------

@@ -80,7 +80,10 @@ class SimulationResult:
             "tiers":            self.propagation.tiers,
             "merged_scores":    self.merged_scores,
         }
-        path.write_text(json.dumps(payload, indent=2, default=str))
+        path.write_text(
+            json.dumps(payload, indent=2, default=str),
+            encoding="utf-8",
+        )
         print(f"[Engine] Result saved → {path}")
 
 

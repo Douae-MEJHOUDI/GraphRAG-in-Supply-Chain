@@ -113,7 +113,10 @@ class RiskReport:
             "resilience_assessment": self.resilience_assessment,
             "full_text":             self.full_text,
         }
-        path.write_text(json.dumps(payload, indent=2, ensure_ascii=False))
+        path.write_text(
+            json.dumps(payload, indent=2, ensure_ascii=False),
+            encoding="utf-8",
+        )
         print(f"[Generator] Report saved → {path}")
 
     def display(self) -> str:
@@ -207,8 +210,8 @@ class RiskReportGenerator:
 
     def __init__(
         self,
-        backend:     str = "openai",
-        model:       str = "gpt-4o-mini",
+        backend:     str = "ollama",
+        model:       str = "mistral",
         max_tokens:  int = 1500,
         temperature: float = 0.2,
     ):
@@ -333,22 +336,58 @@ class RiskReportGenerator:
     # Ollama backend
     # ------------------------------------------------------------------
 
+    def _ollama_base_url(self) -> str:
+        """Resolve Ollama base URL from env, defaulting to localhost."""
+        return os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434").rstrip("/")
+
     def _validate_ollama(self) -> None:
-        """Check that the Ollama server is reachable."""
+        """Check that the Ollama server is reachable and model is available."""
         import urllib.request
+        import urllib.error
+        import json as _json
+
+        base_url = self._ollama_base_url()
+
         try:
-            urllib.request.urlopen("http://localhost:11434", timeout=3)
-        except Exception:
+            with urllib.request.urlopen(f"{base_url}/api/tags", timeout=4) as resp:
+                data = _json.loads(resp.read().decode("utf-8", errors="replace"))
+        except urllib.error.URLError as exc:
             raise ConnectionError(
-                "Ollama server not reachable at http://localhost:11434.\n"
+                f"Ollama server not reachable at {base_url}.\n"
                 "Install Ollama from https://ollama.ai/download\n"
+                "Then start Ollama and verify the URL.\n"
                 f"Then run: ollama pull {self.model}"
+            ) from exc
+        except urllib.error.HTTPError as exc:
+            body = exc.read().decode("utf-8", errors="replace")
+            raise RuntimeError(
+                f"Ollama health check failed at {base_url}/api/tags with HTTP {exc.code}.\n"
+                f"Response: {body[:300]}"
+            ) from exc
+
+        available_models = {
+            m.get("name", "")
+            for m in data.get("models", [])
+            if isinstance(m, dict)
+        }
+
+        # Allow short-name or explicit :latest in user config.
+        accepted_names = {self.model, f"{self.model}:latest"}
+        if available_models and accepted_names.isdisjoint(available_models):
+            preview = ", ".join(sorted(list(available_models))[:8]) or "(none)"
+            raise RuntimeError(
+                f"Ollama model '{self.model}' is not available on this machine.\n"
+                f"Found: {preview}\n"
+                f"Run: ollama pull {self.model}"
             )
 
     def _call_ollama(self, prompt: str) -> tuple[str, int]:
         """Call the local Ollama API and return (text, tokens)."""
         import urllib.request
+        import urllib.error
         import json as _json
+
+        base_url = self._ollama_base_url()
 
         payload = _json.dumps({
             "model":  self.model,
@@ -361,14 +400,48 @@ class RiskReportGenerator:
         }).encode()
 
         req = urllib.request.Request(
-            "http://localhost:11434/api/generate",
+            f"{base_url}/api/generate",
             data=payload,
             headers={"Content-Type": "application/json"},
             method="POST",
         )
 
-        with urllib.request.urlopen(req, timeout=120) as resp:
-            data = _json.loads(resp.read().decode())
+        try:
+            with urllib.request.urlopen(req, timeout=120) as resp:
+                data = _json.loads(resp.read().decode("utf-8", errors="replace"))
+        except urllib.error.HTTPError as exc:
+            body = exc.read().decode("utf-8", errors="replace")
+            err_msg = body
+            try:
+                parsed = _json.loads(body)
+                err_msg = parsed.get("error", body)
+            except Exception:
+                pass
+
+            if exc.code == 404 and "model" in err_msg.lower() and "not found" in err_msg.lower():
+                raise RuntimeError(
+                    f"Ollama model '{self.model}' is not installed.\n"
+                    f"Run: ollama pull {self.model}"
+                ) from exc
+
+            if exc.code == 404:
+                raise RuntimeError(
+                    f"Ollama endpoint not found at {base_url}/api/generate (HTTP 404).\n"
+                    "If OLLAMA_BASE_URL is set, ensure it points to the Ollama root URL,\n"
+                    "for example: http://localhost:11434"
+                ) from exc
+
+            raise RuntimeError(
+                f"Ollama request failed with HTTP {exc.code}: {err_msg[:400]}"
+            ) from exc
+        except urllib.error.URLError as exc:
+            raise ConnectionError(
+                f"Could not connect to Ollama at {base_url}.\n"
+                "Start Ollama and retry."
+            ) from exc
+
+        if isinstance(data, dict) and data.get("error"):
+            raise RuntimeError(f"Ollama error: {data['error']}")
 
         raw_text = data.get("response", "")
         tokens   = data.get("eval_count", 0)
