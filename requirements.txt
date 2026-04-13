@@ -26,4 +26,10 @@ python-louvain==0.16             # Louvain community detection
 transformers==4.43.3             # HuggingFace (T5/BART summarization)
 
 # ── Module 4 (install before running notebook 04) ────────────────────────────
-openai==1.37.1                   # GPT-4o-mini API (optional — can use Ollama instead)
+anthropic>=0.28.0                # Claude Sonnet 4.6 — primary report generation backend
+openai==1.37.1                   # secondary backend (optional)
+
+# ── Web UI (Task 7) ───────────────────────────────────────────────────────────
+fastapi==0.111.0                 # REST API backend
+uvicorn[standard]==0.30.1        # ASGI server
+python-multipart==0.0.9          # form data parsing (FastAPI dependency)

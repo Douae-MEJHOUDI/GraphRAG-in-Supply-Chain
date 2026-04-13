@@ -1,39 +1,40 @@
 """
 evaluator.py
 ------------
-RiskReportEvaluator — compares three system conditions for the ablation study.
+Three-metric evaluation framework .
 
-This is the evaluation infrastructure used in Module 5, but built here
-in Module 4 so it runs alongside generation.
-
-Three conditions
+Metrics
 ----------------
-  Condition A — Baseline LLM
-    The LLM receives only the question, no graph context at all.
-    Represents "what does the model know from pretraining alone?"
+  1. Graph Construction 
+       Manually labeled relationships checked against the extracted graph.
+       Computed as: |correctly extracted triples| / |gold triples|  (recall).
+       Reference: edge_case_gold_triples.jsonl vs extracted graph.
 
-  Condition B — Vector RAG
-    The LLM receives the top-K most similar nodes by embedding similarity,
-    with NO graph traversal and NO disruption scores.
-    Represents "what does semantic search alone retrieve?"
+  2. Retrieval Quality 
+       Expected entities checked in the returned subgraph.
+       Computed as: |expected entities found in subgraph| / |expected entities|
 
-  Condition C — GraphRAG + Simulation (this project)
-    The LLM receives the full enriched context: subgraph + community
-    summaries + disruption scores + dependency paths.
-    Represents the full pipeline.
+  3. Report Coverage 
+       Expected entities checked in Claude's output.
+       Computed as: |expected entities found in report text| / |expected entities|
 
-Evaluation metrics
-------------------
-  1. Multi-hop accuracy  — does the answer surface entities that are
-     2+ hops from ground-zero? (manually labelled ground truth)
-  2. Faithfulness        — does the answer contradict the graph?
-     (checked by an LLM judge prompt)
-  3. Citation rate       — what fraction of factual claims cite a
-     specific entity name or graph path?
-  4. Disruption coverage — what fraction of nodes above the exposure
-     threshold appear in the answer?
-  5. Hallucination rate  — does the answer invent relationships not
-     in the graph? (LLM judge)
+Ablation study (Final Report Coverage)
+---------------------------------------------------------
+  Condition A — Baseline LLM  (no graph context)
+  Condition B — Vector RAG    (top-K semantic only)
+  Condition C — GraphRAG+Sim  (full pipeline)
+
+Usage
+-----
+    evaluator = PipelineEvaluator(G, encoder, pipeline, generator)
+
+    gc  = evaluator.graph_construction_score(gold_triples_path)
+    rq  = evaluator.retrieval_quality_score(queries_with_expected)
+    rc  = evaluator.report_coverage_score(queries_with_expected, events)
+
+    # Ablation
+    ablation = evaluator.run_ablation(event, query, expected_entities)
+    print(ablation.table())
 """
 
 from __future__ import annotations
@@ -44,347 +45,567 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
-from src.simulation.engine    import SimulationResult
-from src.simulation.propagator import PropagationResult
-from src.generation.generator  import RiskReport, RiskReportGenerator
+import networkx as nx
+
+from src.graph.schema import NODE_ATTR_TYPE, EDGE_ATTR_RELATION
+from src.simulation.events import DisruptionEvent
 
 
 # ---------------------------------------------------------------------------
-# Metric result dataclasses
+# Data structures
 # ---------------------------------------------------------------------------
 
 @dataclass
-class ConditionResult:
-    """Result for a single evaluation condition."""
-    condition:       str          # "baseline", "vector_rag", "graphrag_sim"
-    prompt_used:     str          # the exact prompt sent to the LLM
-    report:          RiskReport
-    metrics:         dict         = field(default_factory=dict)
+class GraphConstructionResult:
+    """
+    Metric 1: Graph Construction.
+    Manually labeled relationships checked against extracted graph.
+    """
+    gold_total:    int
+    pred_total:    int
+    true_positive: int
+    precision:     float
+    recall:        float
+    f1:            float
+    per_relation:  dict = field(default_factory=dict)
+
+    def summary(self) -> str:
+        return (
+            f"Graph Construction\n"
+            f"  Gold triples     : {self.gold_total}\n"
+            f"  Predicted        : {self.pred_total}\n"
+            f"  True positives   : {self.true_positive}\n"
+            f"  Precision        : {self.precision:.2%}\n"
+            f"  Recall           : {self.recall:.2%}\n"
+            f"  F1               : {self.f1:.2%}\n"
+        )
+
+
+@dataclass
+class RetrievalQualityResult:
+    """
+    Metric 2: Retrieval Quality.
+    Expected entities checked in returned subgraph.
+    """
+    queries_evaluated:  int
+    mean_coverage:      float   
+    per_query:          list[dict] = field(default_factory=list)
+
+    def summary(self) -> str:
+        return (
+            f"Retrieval Quality\n"
+            f"  Queries evaluated: {self.queries_evaluated}\n"
+            f"  Mean coverage    : {self.mean_coverage:.2%}\n"
+        )
+
+
+@dataclass
+class ReportCoverageResult:
+    """
+    Metric 3: Report Coverage.
+    Expected entities checked in Claude's output.
+    """
+    queries_evaluated: int
+    mean_coverage:     float   
+    per_query:         list[dict] = field(default_factory=list)
+
+    def summary(self) -> str:
+        return (
+            f"Report Coverage\n"
+            f"  Queries evaluated: {self.queries_evaluated}\n"
+            f"  Mean coverage    : {self.mean_coverage:.2%}\n"
+        )
+
+
+@dataclass
+class AblationCondition:
+    """Result for one ablation condition."""
+    name:          str     # "Baseline LLM", "Vector RAG", "GraphRAG+Sim"
+    report_text:   str
+    coverage:      float   # report coverage against expected entities
+    entities_hit:  list[str]
+    entities_missed: list[str]
 
 
 @dataclass
 class AblationResult:
-    """Full ablation study result for one query/scenario pair."""
-    query:             str
-    event_name:        str
-    baseline:          ConditionResult
-    vector_rag:        ConditionResult
-    graphrag_sim:      ConditionResult
-    comparison_table:  str        = ""    # formatted display string
+    """
+    Final Report Coverage ablation.
+    Baseline LLM, Vector RAG, Our Approach.
+    """
+    query:       str
+    event_name:  str
+    baseline:    AblationCondition
+    vector_rag:  AblationCondition
+    graphrag_sim: AblationCondition
+
+    def table(self) -> str:
+        sep = "─" * 60
+        rows = [
+            sep,
+            f"  {'Condition':<22} {'Coverage':>10}   Entities found",
+            sep,
+            f"  {'Baseline LLM':<22} {self.baseline.coverage:>9.1%}"
+            f"   {len(self.baseline.entities_hit)}/{len(self.baseline.entities_hit)+len(self.baseline.entities_missed)}",
+            f"  {'Vector RAG':<22} {self.vector_rag.coverage:>9.1%}"
+            f"   {len(self.vector_rag.entities_hit)}/{len(self.vector_rag.entities_hit)+len(self.vector_rag.entities_missed)}",
+            f"  {'GraphRAG + Simulation':<22} {self.graphrag_sim.coverage:>9.1%}"
+            f"   {len(self.graphrag_sim.entities_hit)}/{len(self.graphrag_sim.entities_hit)+len(self.graphrag_sim.entities_missed)}",
+            sep,
+            "  Final Report Coverage",
+        ]
+        return "\n".join(rows)
 
     def save(self, path: str | Path) -> None:
         path = Path(path)
         path.parent.mkdir(parents=True, exist_ok=True)
-        payload = {
-            "query":      self.query,
-            "event_name": self.event_name,
-            "baseline":   {
-                "metrics": self.baseline.metrics,
-                "report":  self.baseline.report.full_text[:500],
-            },
-            "vector_rag": {
-                "metrics": self.vector_rag.metrics,
-                "report":  self.vector_rag.report.full_text[:500],
-            },
-            "graphrag_sim": {
-                "metrics": self.graphrag_sim.metrics,
-                "report":  self.graphrag_sim.report.full_text[:500],
-            },
-        }
         path.write_text(
-            json.dumps(payload, indent=2, ensure_ascii=False),
+            json.dumps({
+                "query":       self.query,
+                "event_name":  self.event_name,
+                "baseline":    {"coverage": self.baseline.coverage,
+                                "hits":     self.baseline.entities_hit},
+                "vector_rag":  {"coverage": self.vector_rag.coverage,
+                                "hits":     self.vector_rag.entities_hit},
+                "graphrag_sim":{"coverage": self.graphrag_sim.coverage,
+                                "hits":     self.graphrag_sim.entities_hit},
+            }, indent=2, ensure_ascii=False),
             encoding="utf-8",
         )
-        print(f"[Evaluator] Ablation result saved → {path}")
 
 
 # ---------------------------------------------------------------------------
-# RiskReportEvaluator
+# PipelineEvaluator
 # ---------------------------------------------------------------------------
 
-class RiskReportEvaluator:
+class PipelineEvaluator:
     """
-    Runs the three-condition ablation study and computes evaluation metrics.
+    Computes the three metrics and runs the ablation study.
 
-    Usage
-    -----
-    >>> evaluator = RiskReportEvaluator(generator, encoder, G)
-    >>> ablation = evaluator.run_ablation(sim_result, ground_truth_nodes)
-    >>> print(ablation.comparison_table)
+    Parameters
+    ----------
+    graph     : the supply chain knowledge graph (nx.DiGraph)
+    encoder   : NodeEncoder with FAISS index loaded
+    pipeline  : GraphRAGPipeline for retrieval
+    generator : RiskReportGenerator for report generation (optional)
     """
 
-    def __init__(
-        self,
-        generator,          # RiskReportGenerator instance
-        encoder,            # NodeEncoder from Module 1
-        graph,              # nx.DiGraph
-        exposure_threshold: float = 0.25,  # nodes above this score count as "affected"
-    ):
-        self.generator          = generator
-        self.encoder            = encoder
-        self.G                  = graph
-        self.exposure_threshold = exposure_threshold
+    def __init__(self, graph: nx.DiGraph, encoder, pipeline, generator=None):
+        self.G         = graph
+        self.encoder   = encoder
+        self.pipeline  = pipeline
+        self.generator = generator
 
     # ------------------------------------------------------------------
-    # Main ablation runner
+    # Metric 1: Graph Construction
+    # ------------------------------------------------------------------
+
+    def graph_construction_score(
+        self,
+        gold_path: str | Path,
+        format:    str = "jsonl",   # "jsonl" or "json"
+    ) -> GraphConstructionResult:
+        """
+        Graph Construction.
+
+        Loads gold triples from `gold_path` and checks each triple against
+        the extracted graph.  A triple (head, relation, tail) is a true
+        positive if the graph contains an edge head→tail with matching relation.
+
+        Parameters
+        ----------
+        gold_path : path to manually-labeled ground-truth triples
+        format    : "jsonl" (one JSON per line) or "json" (array)
+        """
+        gold_path = Path(gold_path)
+        raw = []
+        if format == "jsonl":
+            for line in gold_path.read_text(encoding="utf-8").splitlines():
+                line = line.strip()
+                if line:
+                    raw.append(json.loads(line))
+        else:
+            raw = json.loads(gold_path.read_text(encoding="utf-8"))
+
+        gold_triples = [
+            (r["head"], r["relation"], r["tail"])
+            for r in raw
+            if all(k in r for k in ("head", "relation", "tail"))
+        ]
+
+        true_positives = 0
+        per_relation: dict[str, dict] = {}
+
+        for head, relation, tail in gold_triples:
+            rel_stats = per_relation.setdefault(
+                relation, {"gold": 0, "tp": 0}
+            )
+            rel_stats["gold"] += 1
+
+            # Check if graph contains a matching edge
+            if (
+                self.G.has_node(head)
+                and self.G.has_node(tail)
+                and self.G.has_edge(head, tail)
+            ):
+                edge_data  = self.G.get_edge_data(head, tail)
+                edge_rel   = edge_data.get(EDGE_ATTR_RELATION, "")
+                if edge_rel == relation:
+                    true_positives += 1
+                    rel_stats["tp"] += 1
+
+        gold_total = len(gold_triples)
+        pred_total = self.G.number_of_edges()
+        precision  = true_positives / pred_total if pred_total else 0.0
+        recall     = true_positives / gold_total  if gold_total  else 0.0
+        f1 = (2 * precision * recall / (precision + recall)
+              if (precision + recall) else 0.0)
+
+        # Per-relation recall
+        for rel, stats in per_relation.items():
+            stats["recall"] = round(
+                stats["tp"] / stats["gold"] if stats["gold"] else 0.0, 3
+            )
+
+        result = GraphConstructionResult(
+            gold_total=gold_total,
+            pred_total=pred_total,
+            true_positive=true_positives,
+            precision=round(precision, 4),
+            recall=round(recall, 4),
+            f1=round(f1, 4),
+            per_relation=per_relation,
+        )
+        print(result.summary())
+        return result
+
+    # ------------------------------------------------------------------
+    # Metric 2: Retrieval Quality
+    # ------------------------------------------------------------------
+
+    def retrieval_quality_score(
+        self,
+        eval_suite: list[dict],
+    ) -> RetrievalQualityResult:
+        """
+        Retrieval Quality.
+
+        For each query in eval_suite, retrieve the subgraph and measure what
+        fraction of `expected_entities` appear in the returned nodes.
+
+        Parameters
+        ----------
+        eval_suite : list of dicts, each with keys:
+            "query"             : str
+            "expected_entities" : list[str]  — nodes that MUST appear in subgraph
+        """
+        per_query   = []
+        coverages   = []
+
+        for item in eval_suite:
+            query    = item["query"]
+            expected = item.get("expected_entities", [])
+            if not expected:
+                continue
+
+            result       = self.pipeline.query(query)
+            subgraph_nodes = set(result.subgraph_result.graph.nodes())
+
+            hits   = [e for e in expected if e in subgraph_nodes]
+            cov    = len(hits) / len(expected)
+            coverages.append(cov)
+
+            per_query.append({
+                "query":    query,
+                "coverage": round(cov, 4),
+                "hits":     hits,
+                "missed":   [e for e in expected if e not in subgraph_nodes],
+            })
+
+        mean_cov = sum(coverages) / len(coverages) if coverages else 0.0
+        result = RetrievalQualityResult(
+            queries_evaluated=len(coverages),
+            mean_coverage=round(mean_cov, 4),
+            per_query=per_query,
+        )
+        print(result.summary())
+        return result
+
+    # ------------------------------------------------------------------
+    # Metric 3: Report Coverage
+    # ------------------------------------------------------------------
+
+    def report_coverage_score(
+        self,
+        eval_suite:    list[dict],
+        events_by_name: dict,
+    ) -> ReportCoverageResult:
+        """
+        Report Coverage.
+
+        For each query in eval_suite, run the full pipeline and measure what
+        fraction of `expected_entities` appear in Claude's output.
+
+        Parameters
+        ----------
+        eval_suite : list of dicts, each with keys:
+            "query"             : str
+            "event_name"        : str
+            "expected_entities" : list[str]
+        events_by_name : dict[str, DisruptionEvent]
+        """
+        if self.generator is None:
+            raise RuntimeError(
+                "Report coverage requires a generator. "
+                "Pass generator= to PipelineEvaluator()."
+            )
+
+        per_query = []
+        coverages = []
+
+        for item in eval_suite:
+            query    = item["query"]
+            expected = item.get("expected_entities", [])
+            event    = events_by_name.get(item.get("event_name", ""))
+            if not expected or event is None:
+                continue
+
+            from src.simulation.engine import SimulationEngine
+            from src.simulation.propagator import DisruptionPropagator
+
+            # Build a minimal SimulationResult for the generator
+            propagator = DisruptionPropagator(self.G)
+            prop       = propagator.propagate(event)
+            rag_result = self.pipeline.query(query)
+
+            from src.simulation.engine import SimulationResult
+            from src.simulation.engine import SimulationEngine as _SE
+            tmp_engine = _SE(self.G, self.pipeline)
+            sim_result = tmp_engine.run(event=event, query=query)
+
+            report     = self.generator.generate(sim_result)
+            report_text = report.full_text.lower()
+
+            hits   = [e for e in expected if e.lower() in report_text]
+            cov    = len(hits) / len(expected)
+            coverages.append(cov)
+
+            per_query.append({
+                "query":    query,
+                "coverage": round(cov, 4),
+                "hits":     hits,
+                "missed":   [e for e in expected if e.lower() not in report_text],
+            })
+
+        mean_cov = sum(coverages) / len(coverages) if coverages else 0.0
+        result = ReportCoverageResult(
+            queries_evaluated=len(coverages),
+            mean_coverage=round(mean_cov, 4),
+            per_query=per_query,
+        )
+        print(result.summary())
+        return result
+
+    # ------------------------------------------------------------------
+    # Ablation study
     # ------------------------------------------------------------------
 
     def run_ablation(
         self,
-        sim_result:          SimulationResult,
-        ground_truth_nodes:  Optional[list[str]] = None,
+        event:             "DisruptionEvent",
+        query:             str,
+        expected_entities: list[str],
     ) -> AblationResult:
         """
-        Run all three conditions for a single scenario and compute metrics.
+        Ablation: compare three conditions on Final Report Coverage.
+
+        Condition A — Baseline LLM  (no graph context)
+        Condition B — Vector RAG    (top-K semantic nodes, no traversal)
+        Condition C — GraphRAG+Sim  (full pipeline — our approach)
 
         Parameters
         ----------
-        sim_result          : full SimulationResult from Module 3
-        ground_truth_nodes  : list of node names that SHOULD appear in a
-                              correct answer (for multi-hop accuracy metric).
-                              If None, inferred from propagation result.
-
-        Returns
-        -------
-        AblationResult
+        event             : DisruptionEvent to simulate
+        query             : natural language question
+        expected_entities : ground-truth list of entities that should appear
+                            in a correct answer
         """
-        query      = sim_result.graphrag_result.query
-        event_name = sim_result.event.name
+        if self.generator is None:
+            raise RuntimeError("Ablation requires a generator.")
 
-        # Infer ground truth from propagation if not provided
-        if ground_truth_nodes is None:
-            ground_truth_nodes = list(sim_result.propagation.scores.keys())
-
-        print(f"\n[Evaluator] Running ablation for: {event_name}")
+        print(f"\n[Evaluator] Ablation: {event.name}")
         print(f"  Query: {query[:70]}...")
+        print(f"  Expected entities: {expected_entities}")
 
-        # ── Condition A: Baseline ─────────────────────────────────────
-        print("\n[Evaluator] Condition A: Baseline LLM (no context)...")
-        baseline_prompt = self._build_baseline_prompt(query, sim_result.event)
-        baseline_report = self._generate_with_prompt(baseline_prompt, event_name, query)
-        baseline_metrics = self._compute_metrics(
-            baseline_report, sim_result.propagation, ground_truth_nodes, "baseline"
+        # ── Condition A: Baseline LLM ─────────────────────────────────
+        print("\n[Evaluator] A) Baseline LLM...")
+        baseline_text = self._call_llm_baseline(event, query)
+        baseline = self._score_condition(
+            "Baseline LLM", baseline_text, expected_entities
         )
-        baseline = ConditionResult("baseline", baseline_prompt,
-                                   baseline_report, baseline_metrics)
 
         # ── Condition B: Vector RAG ───────────────────────────────────
-        print("\n[Evaluator] Condition B: Vector RAG (semantic search only)...")
-        vector_prompt = self._build_vector_rag_prompt(
-            query, sim_result.event, top_k=8
+        print("\n[Evaluator] B) Vector RAG...")
+        vector_text = self._call_llm_vector_rag(event, query, top_k=8)
+        vector_rag  = self._score_condition(
+            "Vector RAG", vector_text, expected_entities
         )
-        vector_report = self._generate_with_prompt(vector_prompt, event_name, query)
-        vector_metrics = self._compute_metrics(
-            vector_report, sim_result.propagation, ground_truth_nodes, "vector_rag"
-        )
-        vector_rag = ConditionResult("vector_rag", vector_prompt,
-                                     vector_report, vector_metrics)
 
         # ── Condition C: GraphRAG + Simulation ────────────────────────
-        print("\n[Evaluator] Condition C: GraphRAG + Simulation (full pipeline)...")
-        graphrag_report = self.generator.generate(sim_result)
-        graphrag_metrics = self._compute_metrics(
-            graphrag_report, sim_result.propagation, ground_truth_nodes, "graphrag_sim"
-        )
-        graphrag_sim = ConditionResult(
-            "graphrag_sim", sim_result.risk_report_prompt,
-            graphrag_report, graphrag_metrics
+        print("\n[Evaluator] C) GraphRAG + Simulation (our approach)...")
+        from src.simulation.engine import SimulationEngine
+        engine     = SimulationEngine(self.G, self.pipeline)
+        sim_result = engine.run(event=event, query=query)
+        report     = self.generator.generate(sim_result)
+        graphrag_sim = self._score_condition(
+            "GraphRAG+Sim", report.full_text, expected_entities
         )
 
-        # ── Build comparison table ────────────────────────────────────
-        table = self._build_comparison_table(baseline, vector_rag, graphrag_sim)
-
-        return AblationResult(
+        result = AblationResult(
             query=query,
-            event_name=event_name,
+            event_name=event.name,
             baseline=baseline,
             vector_rag=vector_rag,
             graphrag_sim=graphrag_sim,
-            comparison_table=table,
+        )
+        print("\n" + result.table())
+        return result
+
+    # ------------------------------------------------------------------
+    # Ablation helpers
+    # ------------------------------------------------------------------
+
+    def _score_condition(
+        self,
+        name:     str,
+        text:     str,
+        expected: list[str],
+    ) -> AblationCondition:
+        """Check which expected entities appear in the report text."""
+        lower = text.lower()
+        hits   = [e for e in expected if e.lower() in lower]
+        missed = [e for e in expected if e.lower() not in lower]
+        cov    = len(hits) / len(expected) if expected else 0.0
+        return AblationCondition(
+            name=name,
+            report_text=text,
+            coverage=round(cov, 4),
+            entities_hit=hits,
+            entities_missed=missed,
         )
 
-    # ------------------------------------------------------------------
-    # Prompt builders for baseline and vector RAG conditions
-    # ------------------------------------------------------------------
-
-    def _build_baseline_prompt(
-        self, query: str, event: "DisruptionEvent"
+    def _call_llm_baseline(
+        self, event: "DisruptionEvent", query: str
     ) -> str:
-        """
-        Condition A: no graph context at all — just the raw question.
-        This measures what the LLM knows from pretraining alone.
-        """
-        return (
+        """Generate a report with no graph context (Condition A)."""
+        prompt = (
             f"You are a senior supply chain risk analyst.\n\n"
             f"A disruption event has occurred: {event.name}.\n"
             f"Description: {event.description}\n\n"
             f"Question: {query}\n\n"
-            f"Please provide a risk assessment based on your knowledge.\n\n"
+            f"Provide a detailed risk assessment based on your knowledge.\n\n"
             f"--- RISK REPORT ---"
         )
+        return self.generator._raw_generate(prompt)
 
-    def _build_vector_rag_prompt(
-        self, query: str, event: "DisruptionEvent", top_k: int = 8
+    def _call_llm_vector_rag(
+        self, event: "DisruptionEvent", query: str, top_k: int
     ) -> str:
-        """
-        Condition B: top-K nodes by embedding similarity only.
-        No graph traversal, no disruption scores, no path traces.
-        This measures what semantic search alone retrieves.
-        """
+        """Generate a report with top-K semantic nodes only (Condition B)."""
         results = self.encoder.search(query, k=top_k)
-
-        context_lines = [
-            f"=== Vector RAG Context (semantic search, top {top_k} nodes) ===",
+        lines   = [
+            f"=== Vector RAG Context (top {top_k} semantically similar nodes) ===",
             f"Event: {event.name}",
-            f"Query: {query}",
             "",
         ]
         for node, score in results:
             if node not in self.G:
                 continue
-            from src.graph.schema import NODE_ATTR_TYPE
             etype = self.G.nodes[node].get(NODE_ATTR_TYPE, "Unknown")
-            context_lines.append(
-                f"[NODE] {node} | Type: {etype} | Similarity: {score:.3f}"
-            )
+            lines.append(f"  [{etype}] {node}  (similarity={score:.3f})")
 
-        context = "\n".join(context_lines)
-
-        return (
+        context = "\n".join(lines)
+        prompt = (
             f"You are a senior supply chain risk analyst.\n"
             f"Use ONLY the context below to answer.\n\n"
             f"{context}\n\n"
-            f"--- Question ---\n{query}\n\n"
+            f"Question: {query}\n\n"
             f"--- RISK REPORT ---"
         )
+        return self.generator._raw_generate(prompt)
 
-    def _generate_with_prompt(
-        self, prompt: str, event_name: str, query: str
-    ) -> RiskReport:
-        """Call the generator with a custom prompt (bypasses SimulationResult)."""
-        from src.generation.generator import RiskReport, STRUCTURED_PROMPT_SUFFIX
-        import time
 
-        full_prompt = prompt + STRUCTURED_PROMPT_SUFFIX
-        t0 = time.time()
+# ---------------------------------------------------------------------------
+# Benchmark runner — loads the standard eval suite and runs all 3 metrics
+# ---------------------------------------------------------------------------
 
-        if self.generator.backend.value == "openai":
-            raw_text, tokens = self.generator._call_openai(full_prompt)
-        else:
-            raw_text, tokens = self.generator._call_ollama(full_prompt)
+def run_full_benchmark(
+    evaluator:         PipelineEvaluator,
+    gold_triples_path: str | Path,
+    benchmark_path:    str | Path,
+    events_by_name:    dict,
+    output_dir:        str | Path = "outputs/evaluation",
+) -> dict:
+    """
+    Run the complete evaluation and save results to `output_dir`.
 
-        elapsed = time.time() - t0
-        return self.generator._parse_output(raw_text, event_name, query,
-                                            tokens, elapsed)
-
-    # ------------------------------------------------------------------
-    # Metrics
-    # ------------------------------------------------------------------
-
-    def _compute_metrics(
-        self,
-        report:               RiskReport,
-        propagation:          PropagationResult,
-        ground_truth_nodes:   list[str],
-        condition:            str,
-    ) -> dict:
-        """
-        Compute all five evaluation metrics for one condition's report.
-
-        Returns a dict with keys:
-          multi_hop_accuracy, citation_rate, disruption_coverage,
-          answer_length_words, entities_mentioned
-        """
-        text = report.full_text.lower()
-
-        # 1. Multi-hop accuracy
-        #    How many ground-truth affected nodes are mentioned in the answer?
-        mentioned = [n for n in ground_truth_nodes if n.lower() in text]
-        multi_hop_acc = (
-            round(len(mentioned) / len(ground_truth_nodes), 3)
-            if ground_truth_nodes else 0.0
-        )
-
-        # 2. Citation rate
-        #    Fraction of sentences that mention at least one graph entity.
-        sentences = [s.strip() for s in re.split(r'[.!?]', report.full_text)
-                     if len(s.strip()) > 20]
-        cited = sum(
-            1 for s in sentences
-            if any(n.lower() in s.lower() for n in self.G.nodes())
-        )
-        citation_rate = (
-            round(cited / len(sentences), 3) if sentences else 0.0
-        )
-
-        # 3. Disruption coverage
-        #    Fraction of nodes above exposure_threshold that appear in the answer.
-        above_threshold = [
-            n for n, s in propagation.scores.items()
-            if s >= self.exposure_threshold
-        ]
-        covered = [n for n in above_threshold if n.lower() in text]
-        disruption_coverage = (
-            round(len(covered) / len(above_threshold), 3)
-            if above_threshold else 0.0
-        )
-
-        # 4. Answer length
-        word_count = len(report.full_text.split())
-
-        # 5. Entities mentioned (raw count of graph node names in text)
-        entities_mentioned = sum(
-            1 for n in self.G.nodes() if n.lower() in text
-        )
-
-        return {
-            "condition":           condition,
-            "multi_hop_accuracy":  multi_hop_acc,
-            "citation_rate":       citation_rate,
-            "disruption_coverage": disruption_coverage,
-            "answer_length_words": word_count,
-            "entities_mentioned":  entities_mentioned,
-            "nodes_mentioned":     mentioned[:10],  # sample for inspection
+    Returns a summary dict:
+        {
+          "graph_construction": recall,
+          "retrieval_quality":  mean_coverage,
+          "report_coverage":    mean_coverage,
         }
+    """
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
 
-    # ------------------------------------------------------------------
-    # Comparison table formatter
-    # ------------------------------------------------------------------
+    benchmark_path = Path(benchmark_path)
+    suite = json.loads(benchmark_path.read_text(encoding="utf-8"))
 
-    def _build_comparison_table(
-        self,
-        baseline:    ConditionResult,
-        vector_rag:  ConditionResult,
-        graphrag_sim: ConditionResult,
-    ) -> str:
-        """Build a formatted comparison table for notebook display."""
-        m_b  = baseline.metrics
-        m_v  = vector_rag.metrics
-        m_g  = graphrag_sim.metrics
+    # Metric 1
+    gc = evaluator.graph_construction_score(gold_triples_path)
+    (output_dir / "metric1_graph_construction.json").write_text(
+        json.dumps({
+            "recall":    gc.recall,
+            "precision": gc.precision,
+            "f1":        gc.f1,
+            "per_relation": gc.per_relation,
+        }, indent=2),
+        encoding="utf-8",
+    )
 
-        def row(label, key, fmt=".3f"):
-            b = format(m_b.get(key, 0), fmt)
-            v = format(m_v.get(key, 0), fmt)
-            g = format(m_g.get(key, 0), fmt)
-            # Bold the best value with an asterisk
-            vals = [float(x) for x in [b, v, g]]
-            best_idx = vals.index(max(vals))
-            markers = ["", "", ""]
-            markers[best_idx] = " *"
-            return (f"  {label:30s} {b+markers[0]:>12s}"
-                    f" {v+markers[1]:>12s} {g+markers[2]:>12s}")
+    # Metric 2
+    rq = evaluator.retrieval_quality_score(suite)
+    (output_dir / "metric2_retrieval_quality.json").write_text(
+        json.dumps({
+            "mean_coverage": rq.mean_coverage,
+            "per_query":     rq.per_query,
+        }, indent=2),
+        encoding="utf-8",
+    )
 
-        sep = "-" * 70
-        lines = [
-            sep,
-            f"  {'Metric':30s} {'Baseline':>12s} {'Vector RAG':>12s} {'GraphRAG+Sim':>12s}",
-            sep,
-            row("Multi-hop accuracy",   "multi_hop_accuracy"),
-            row("Citation rate",        "citation_rate"),
-            row("Disruption coverage",  "disruption_coverage"),
-            row("Entities mentioned",   "entities_mentioned", "d"),
-            row("Answer length (words)","answer_length_words", "d"),
-            sep,
-            "  * = best value for this metric",
-        ]
-        return "\n".join(lines)
+    # Metric 3
+    rc = evaluator.report_coverage_score(suite, events_by_name)
+    (output_dir / "metric3_report_coverage.json").write_text(
+        json.dumps({
+            "mean_coverage": rc.mean_coverage,
+            "per_query":     rc.per_query,
+        }, indent=2),
+        encoding="utf-8",
+    )
+
+    summary = {
+        "graph_construction": gc.recall,
+        "retrieval_quality":  rq.mean_coverage,
+        "report_coverage":    rc.mean_coverage,
+    }
+
+    print("\n=== Benchmark Summary ===")
+    print(f"  Graph Construction : {gc.recall:.0%}")
+    print(f"  Retrieval Quality  : {rq.mean_coverage:.0%}")
+    print(f"  Report Coverage    : {rc.mean_coverage:.0%}")
+
+    (output_dir / "benchmark_summary.json").write_text(
+        json.dumps(summary, indent=2), encoding="utf-8"
+    )
+    return summary

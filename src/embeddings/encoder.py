@@ -24,16 +24,21 @@ import networkx as nx
 import faiss
 from sentence_transformers import SentenceTransformer
 
-from src.graph.schema import NODE_ATTR_EMBEDDING, NODE_ATTR_TYPE, NODE_ATTR_METADATA
+from src.graph.schema import (
+    NODE_ATTR_EMBEDDING,
+    NODE_ATTR_TYPE,
+    NODE_ATTR_METADATA,
+    EDGE_ATTR_SOURCE,
+)
 
 
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
 
-DEFAULT_MODEL    = "all-MiniLM-L6-v2"   # 384-dim, fast, good quality
-FAISS_INDEX_TYPE = "flat_l2"            # exact L2 search — swap for IVF at scale
-BATCH_SIZE       = 64                   # sentence-transformer encoding batch size
+DEFAULT_MODEL    = "BAAI/bge-large-en-v1.5"  # 1024-dim, optimised for retrieval
+FAISS_INDEX_TYPE = "flat_ip"                  # inner-product (cosine on L2-normed vecs)
+BATCH_SIZE       = 64                         # sentence-transformer encoding batch size
 
 
 # ---------------------------------------------------------------------------
@@ -44,10 +49,10 @@ class NodeEncoder:
     """
     Encodes graph nodes as dense embeddings and builds a FAISS index.
 
-    The text used to represent each node for embedding is:
-      "<entity_type>: <node_name>"
+    The text used to represent each node for embedding is a rich description:
+      "<entity_type>: <node_name>. Evidence: <source sentences from edges>"
     This gives the model enough context to distinguish "Supplier: TSMC"
-    from "Region: Taiwan" even though both contain "Taiwan".
+    from "Region: Taiwan" and captures relational context from the graph.
 
     Usage
     -----
@@ -61,7 +66,7 @@ class NodeEncoder:
         print(f"[Encoder] Loading model: {model_name}")
         self._model      = SentenceTransformer(model_name)
         self.dim         = self._model.get_sentence_embedding_dimension()
-        self._index:     Optional[faiss.IndexFlatL2] = None
+        self._index:     Optional[faiss.IndexFlatIP] = None
         self._node_names: list[str] = []   # maps FAISS position → node name
         self._graph:     Optional[nx.DiGraph] = None
 
@@ -148,16 +153,15 @@ class NodeEncoder:
             normalize_embeddings=True,
         )
 
-        # FAISS returns L2 distances — convert to cosine similarity
-        # (valid because embeddings are L2-normalised: cos_sim = 1 - dist²/2)
-        distances, indices = self._index.search(query_emb, k)
+        # IndexFlatIP returns inner-product scores directly.
+        # Since vectors are L2-normalised, inner product == cosine similarity.
+        ip_scores, indices = self._index.search(query_emb, k)
         results = []
-        for dist, idx in zip(distances[0], indices[0]):
+        for score, idx in zip(ip_scores[0], indices[0]):
             if idx < 0 or idx >= len(self._node_names):
                 continue
-            name    = self._node_names[idx]
-            sim     = float(1.0 - dist / 2.0)   # convert L2 → cosine
-            results.append((name, round(sim, 4)))
+            name = self._node_names[idx]
+            results.append((name, round(float(score), 4)))
 
         return sorted(results, key=lambda x: x[1], reverse=True)
 
@@ -217,32 +221,46 @@ class NodeEncoder:
 
     def _node_to_text(self, name: str, attrs: dict) -> str:
         """
-        Build the text string used to embed a node.
-        Format: "<EntityType>: <name> [<metadata key=value pairs>]"
-        The entity type prefix is crucial — it disambiguates "Taiwan" as a
-        Region from "Taiwan Semiconductor" as a Supplier.
+        Build the rich description used to embed a node.
+        Format: "<EntityType>: <name>. Evidence: <source sentences from edges>"
+
+        Spec: Name + Type + Evidence.
+        Evidence is collected from the source_text of up to 2 connected edges,
+        giving the model relational context beyond the bare node name.
         """
-        etype    = attrs.get(NODE_ATTR_TYPE, "Entity")
-        metadata = attrs.get(NODE_ATTR_METADATA, {})
+        etype = attrs.get(NODE_ATTR_TYPE, "Entity")
 
-        # Include a few high-signal metadata fields if available
-        meta_str = ""
-        for key in ("country", "capacity", "category", "product"):
-            if key in metadata:
-                meta_str += f" {key}={metadata[key]}"
+        # Collect up to 2 unique evidence sentences from outgoing edges
+        evidence_parts: list[str] = []
+        if self._graph is not None and name in self._graph:
+            seen: set[str] = set()
+            for _, _, edata in self._graph.out_edges(name, data=True):
+                src = edata.get(EDGE_ATTR_SOURCE, "")
+                if src and src not in seen:
+                    seen.add(src)
+                    evidence_parts.append(src)
+                    if len(evidence_parts) >= 2:
+                        break
 
-        return f"{etype}: {name}{meta_str}".strip()
+        if evidence_parts:
+            return f"{etype}: {name}. Evidence: {' '.join(evidence_parts)}"
+        return f"{etype}: {name}"
 
     def _build_index(
         self, node_names: list[str], embeddings: np.ndarray
     ) -> None:
         """
-        Build a FAISS flat L2 index from a matrix of embeddings.
-        Flat L2 is exact (no approximation) and suitable for graphs
-        up to ~100k nodes. For larger graphs, switch to IndexIVFFlat.
+        Build a FAISS IndexFlatIP index from a matrix of L2-normalised embeddings.
+
+        IndexFlatIP (inner product) on L2-normalised vectors is mathematically
+        equivalent to cosine similarity search. Exact (no approximation) and
+        suitable for graphs up to ~100k nodes.
         """
         emb_matrix = embeddings.astype(np.float32)
-        index = faiss.IndexFlatL2(self.dim)
+        # Ensure vectors are unit-normalised (encode() already does this with
+        # normalize_embeddings=True, but we re-normalise here as a safety measure)
+        faiss.normalize_L2(emb_matrix)
+        index = faiss.IndexFlatIP(self.dim)
         index.add(emb_matrix)
         self._index      = index
         self._node_names = node_names

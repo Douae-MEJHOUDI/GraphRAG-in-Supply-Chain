@@ -30,7 +30,7 @@ from src.graph.schema import Entity, EntityType
 # Configuration
 # ---------------------------------------------------------------------------
 
-DEFAULT_MODEL     = "all-MiniLM-L6-v2"   # fast, good quality for short strings
+DEFAULT_MODEL     = "BAAI/bge-large-en-v1.5"  # 1024-dim, consistent with encoder
 SIMILARITY_THRESH = 0.88                  # cosine sim threshold for merging
 CROSS_TYPE_MERGE  = False                 # never merge entities of different types
 

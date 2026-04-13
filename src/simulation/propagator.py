@@ -7,47 +7,53 @@ This module models how a supply chain shock radiates outward from its origin
 through the dependency graph, assigning every reachable node a numeric
 "disruption score" that reflects its exposure to the original event.
 
-Core algorithm
---------------
-Weighted BFS from ground-zero nodes, following directed dependency edges
-(supplies, depends_on, ships_through, located_in) with multiplicative decay:
+Core algorithm — Model 3: Attenuated Bottleneck Routing
+--------------------------------------------------------
+Modified Dijkstra's traversal from ground-zero nodes, following directed
+dependency edges with the Hybrid Wave Propagation formula:
 
-    score(child) = score(parent) × decay × edge_weight
+    F_v = min(F_u, C_{u,v}) · γ
 
 Where:
-  - decay       : configurable [0, 1], default 0.6. Models the real-world
-                  observation that disruptions lose force with each tier.
-                  A value of 0.6 means a tier-2 supplier feels 60% of the
-                  shock that the tier-1 supplier feels.
-  - edge_weight : assigned by builder.assign_edge_weights() in Module 1.
-                  Edges with no alternative supplier → weight ≈ 1.0 (critical).
-                  Edges with many alternatives → weight → 0.25 (redundant).
-                  ALTERNATIVE_TO edges → weight = 0.0 (excluded from propagation).
+  - F_u      : flow (disruption score) arriving at the parent node u
+  - C_{u,v}  : effective edge capacity = edge_weight × relation_type_factor
+                  edge_weight  : 1 / (1 + num_alternatives) — set by Module 1.
+                                 No alternatives → weight ≈ 1.0 (critical).
+                                 Many alternatives → weight → 0.25 (redundant).
+                  rel_factor   : damping for logistics (0.70) / location (0.50)
+                                 edges relative to direct supply/dependency (1.0).
+  - γ (gamma): global decay factor, default 0.85. Models the real-world
+               observation that disruptions lose force with each additional hop.
 
-Why this is supply-chain-aware (not generic graph diffusion)
-------------------------------------------------------------
-Generic graph diffusion would give every edge the same weight.
-Our propagator is different in two important ways:
+Why min() instead of multiplication?
+-------------------------------------
+  - Model 1 (multiplicative): score(child) = score(parent) × decay × weight
+    Problem: fractions multiply across hops → score vanishes near-instantly.
+    Deep, multi-tier failures are completely missed.
 
-  1. Edge direction matters: shock flows FORWARD along dependency edges
-     (supplier → manufacturer → customer). It does not flow backward.
-     This reflects physical reality: if your chip supplier is hit, you
-     are affected; the miners who supply the chip fab's raw materials
-     are not (directly) affected by the same shock.
+  - Model 2 (simple bottleneck): I_N = min(max_parent_flow, B_final_link)
+    Problem: crisis travels with 100% force stopped only by direct bottlenecks,
+    ignoring physical distance. Produces false positives far downstream.
 
-  2. Edge weight encodes supply redundancy: a tier-1 supplier with zero
-     alternatives gets full propagation weight. A supplier with 3
-     alternatives gets 25% weight — the buyer can partially substitute.
-     This makes the simulation quantitatively supply-chain-aware.
+  - Model 3 (this implementation): F_v = min(F_u, C_{u,v}) · γ
+    The min() caps flow at the weakest link seen so far (bottleneck awareness),
+    while γ ensures overall dissipation still happens across hops (wave
+    attenuation). Together they give visibility without false positives.
+
+Why Modified Dijkstra's instead of BFS?
+-----------------------------------------
+BFS visits nodes in arrival order, which means a weak long path can update a
+node before the stronger short path is processed. Modified Dijkstra's uses a
+max-heap (highest flow first), guaranteeing that the first time a node is
+settled it holds the globally-optimal (highest-flow) path — exactly analogous
+to Dijkstra's shortest-path guarantee but for maximum flow.
 
 Propagation follows these edge types (in priority order):
-  supplies, depends_on → direct dependency (full propagation)
-  ships_through        → logistics dependency (partial, configurable)
-  located_in           → geographic co-location risk (partial)
-  affected_by          → direct event association (already ground-zero)
+  supplies, depends_on → direct dependency (rel_factor = 1.0)
+  ships_through        → logistics dependency (rel_factor = 0.70)
+  located_in           → geographic co-location risk (rel_factor = 0.50)
 
-ALTERNATIVE_TO edges are NEVER followed for propagation — they represent
-risk mitigation, not risk transmission.
+ALTERNATIVE_TO and SELLS_TO edges are NEVER followed.
 
 Output
 ------
@@ -56,11 +62,16 @@ PropagationResult — contains:
   - exposure_tiers {CRITICAL/HIGH/MODERATE/LOW: [nodes]}
   - path_traces {node: [path from ground-zero]}  ← explainability
   - summary statistics
+
+Reference
+---------
+Pressure Wave Propagation Optimization Models for Supply Chain Risk Mitigation,
+MDPI, March 2026.
 """
 
 from __future__ import annotations
 
-from collections import defaultdict
+import heapq
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -84,11 +95,11 @@ from src.simulation.events import (
 # Configuration
 # ---------------------------------------------------------------------------
 
-DEFAULT_DECAY          = 0.60   # score multiplier per hop
+DEFAULT_DECAY          = 0.85   # γ — global attenuation per hop
 DEFAULT_MAX_HOPS       = 5      # maximum propagation depth
 PRUNING_THRESHOLD      = 0.03   # stop propagating below this score
-LOGISTICS_DECAY_FACTOR = 0.70   # extra damping for ships_through edges
-LOCATION_DECAY_FACTOR  = 0.50   # extra damping for located_in edges
+LOGISTICS_DECAY_FACTOR = 0.70   # rel_factor for ships_through edges
+LOCATION_DECAY_FACTOR  = 0.50   # rel_factor for located_in edges
 
 # Edge types that carry the disruption forward
 PROPAGATION_EDGES = {
@@ -101,7 +112,7 @@ PROPAGATION_EDGES = {
 # Edge types that are NEVER followed
 BLOCKED_EDGES = {
     RelationType.ALTERNATIVE_TO.value,
-    RelationType.SELLS_TO.value,      # downstream commercial → not a dependency
+    RelationType.SELLS_TO.value,
 }
 
 
@@ -116,22 +127,21 @@ class NodeExposure:
 
     Attributes
     ----------
-    node          : node name
-    score         : disruption score [0, 1]
-    severity      : SeverityLevel derived from score
-    hop_distance  : minimum hops from any ground-zero node
-    entity_type   : EntityType of this node
-    path          : list of node names from ground-zero to this node
+    node           : node name
+    score          : disruption score [0, 1]
+    severity       : SeverityLevel derived from score
+    hop_distance   : minimum hops from any ground-zero node
+    entity_type    : EntityType of this node
+    path           : list of node names from ground-zero to this node
     has_alternative: whether this node has alternative_to edges
-                     (reduces real-world impact despite high score)
     """
     node:            str
     score:           float
     severity:        SeverityLevel
     hop_distance:    int
     entity_type:     str
-    path:            list[str]        = field(default_factory=list)
-    has_alternative: bool             = False
+    path:            list[str] = field(default_factory=list)
+    has_alternative: bool      = False
 
     def __repr__(self) -> str:
         return (
@@ -149,23 +159,19 @@ class PropagationResult:
 
     Attributes
     ----------
-    event          : the DisruptionEvent that triggered this simulation
-    scores         : {node_name: disruption_score}  — all affected nodes
-    exposures      : {node_name: NodeExposure}       — full per-node detail
-    tiers          : {SeverityLevel: [node_names]}   — grouped by severity
-    path_traces    : {node_name: [path]}              — explainability traces
-    stats          : summary statistics dict
+    event       : the DisruptionEvent that triggered this simulation
+    scores      : {node_name: disruption_score}  — all affected nodes
+    exposures   : {node_name: NodeExposure}       — full per-node detail
+    tiers       : {SeverityLevel: [node_names]}   — grouped by severity
+    path_traces : {node_name: [path]}              — explainability traces
+    stats       : summary statistics dict
     """
     event:       DisruptionEvent
     scores:      dict[str, float]
     exposures:   dict[str, NodeExposure]
     tiers:       dict[str, list[str]]
     path_traces: dict[str, list[str]]
-    stats:       dict                  = field(default_factory=dict)
-
-    # ------------------------------------------------------------------
-    # Convenience accessors
-    # ------------------------------------------------------------------
+    stats:       dict = field(default_factory=dict)
 
     def critical_nodes(self) -> list[str]:
         return self.tiers.get(SeverityLevel.CRITICAL.value, [])
@@ -174,25 +180,18 @@ class PropagationResult:
         return self.tiers.get(SeverityLevel.HIGH.value, [])
 
     def affected_nodes(self) -> list[str]:
-        """All nodes with score above the pruning threshold."""
         return list(self.scores.keys())
 
     def top_n(self, n: int = 10) -> list[tuple[str, float]]:
-        """Top-N most exposed nodes as (name, score) pairs."""
         return sorted(self.scores.items(), key=lambda x: -x[1])[:n]
 
     def path_explanation(self, node: str) -> str:
-        """
-        Human-readable dependency chain from ground-zero to a given node.
-        Example: "Taiwan Earthquake → TSMC → Apple → Port of Los Angeles"
-        """
         path = self.path_traces.get(node, [])
         if not path:
             return f"{node} (direct ground-zero)"
         return " → ".join(path)
 
     def exposure_summary(self) -> str:
-        """Short summary string for logging and display."""
         return (
             f"Event: {self.event.name} "
             f"(shock={self.event.initial_shock:.2f})\n"
@@ -210,7 +209,11 @@ class PropagationResult:
 class DisruptionPropagator:
     """
     Propagates a DisruptionEvent through the supply chain knowledge graph
-    using weighted BFS with supply-redundancy-aware edge weights.
+    using Attenuated Bottleneck Routing (Model 3):
+
+        F_v = min(F_u, C_{u,v}) · γ
+
+    traversed via a Modified Dijkstra's algorithm (max-heap on flow).
 
     Usage
     -----
@@ -222,13 +225,13 @@ class DisruptionPropagator:
 
     def __init__(
         self,
-        graph:          nx.DiGraph,
-        decay:          float = DEFAULT_DECAY,
-        max_hops:       int   = DEFAULT_MAX_HOPS,
+        graph:           nx.DiGraph,
+        decay:           float = DEFAULT_DECAY,
+        max_hops:        int   = DEFAULT_MAX_HOPS,
         prune_threshold: float = PRUNING_THRESHOLD,
     ):
         self.G               = graph
-        self.decay           = decay
+        self.decay           = decay       # γ
         self.max_hops        = max_hops
         self.prune_threshold = prune_threshold
 
@@ -238,36 +241,25 @@ class DisruptionPropagator:
 
     def propagate(self, event: DisruptionEvent) -> PropagationResult:
         """
-        Run the full propagation simulation for a disruption event.
+        Run the full Attenuated Bottleneck Routing simulation for one event.
 
         Parameters
         ----------
         event : DisruptionEvent
-            The disruption to simulate. Contains ground-zero nodes and
-            initial shock severity.
 
         Returns
         -------
         PropagationResult
-            Full exposure map with scores, severity tiers, path traces,
-            and summary statistics.
         """
-        # Resolve ground-zero: expand by affected_region if specified
         ground_zero_nodes = self._resolve_ground_zero(event)
 
-        # Run weighted BFS
-        scores, path_traces, hop_distances = self._weighted_bfs(
+        scores, path_traces, hop_distances = self._attenuated_bottleneck_dijkstra(
             ground_zero_nodes, event.initial_shock
         )
 
-        # Build per-node exposure records
         exposures = self._build_exposures(scores, path_traces, hop_distances)
-
-        # Group into severity tiers
-        tiers = self._build_tiers(scores)
-
-        # Compute summary statistics
-        stats = self._compute_stats(scores, hop_distances, event)
+        tiers     = self._build_tiers(scores)
+        stats     = self._compute_stats(scores, hop_distances, event)
 
         result = PropagationResult(
             event=event,
@@ -284,10 +276,6 @@ class DisruptionPropagator:
     def compare_scenarios(
         self, events: list[DisruptionEvent]
     ) -> dict[str, PropagationResult]:
-        """
-        Run multiple disruption scenarios and return all results keyed
-        by event name. Useful for the evaluation section.
-        """
         results = {}
         for event in events:
             print(f"[Propagator] Running scenario: {event.name}")
@@ -302,209 +290,174 @@ class DisruptionPropagator:
         """
         Build the complete list of initially disrupted nodes.
 
-        Steps:
-        1. Start with event.ground_zero (explicit list)
-        2. Collect location seeds from:
-           - event.affected_region
-           - any ground-zero node typed Region
-           - any ground-zero node that has located_in -> location edges
-        3. Expand each location seed to all colocated entities via reverse
-           located_in edges, recursively across nested locations
-           (city -> region -> country)
-        4. Filter to nodes that actually exist in the graph
+        1. Start with event.ground_zero (explicit list).
+        2. Collect location seeds (affected_region + Region-typed GZ nodes).
+        3. Expand each seed to all co-located entities via reverse located_in.
+        4. Filter to nodes that exist in the graph.
         """
-        gz_set = set(event.ground_zero)
+        gz_set: set[str] = set(event.ground_zero)
         location_seeds: set[str] = set()
 
         if event.affected_region:
             location_seeds.add(event.affected_region)
 
-        # Derive location seeds from ground-zero nodes themselves.
         for gz_node in list(gz_set):
             if gz_node not in self.G:
                 continue
-
             gz_type = str(self.G.nodes[gz_node].get(NODE_ATTR_TYPE, ""))
             if gz_type == EntityType.REGION.value:
                 location_seeds.add(gz_node)
-
             for _, target, data in self.G.out_edges(gz_node, data=True):
                 if data.get(EDGE_ATTR_RELATION) == RelationType.LOCATED_IN.value:
                     location_seeds.add(target)
 
-        # Expand from location seeds to all colocated entities and nested
-        # location hierarchy nodes.
         if location_seeds:
             gz_set |= self._expand_location_ground_zero(location_seeds)
 
-        # Filter to nodes that exist in graph
-        valid = [n for n in gz_set if n in self.G]
+        valid   = [n for n in gz_set if n in self.G]
         missing = gz_set - set(valid)
         if missing:
             print(f"[Propagator] Warning: ground-zero nodes not in graph: {missing}")
-
         return valid
 
     def _expand_location_ground_zero(self, location_seeds: set[str]) -> set[str]:
-        """
-        Expand location seeds through reverse located_in links.
-
-        Example:
-          If seed is "Taiwan", include nodes with node -> located_in -> Taiwan.
-          If a location node (e.g., "Hsinchu") is included and itself has
-          Hsinchu -> located_in -> Taiwan, also expand from Hsinchu.
-        """
+        """Expand location seeds via reverse located_in edges (recursive)."""
         expanded: set[str] = set()
         queue = list(location_seeds)
-        seen_locations: set[str] = set()
+        seen:  set[str] = set()
 
         while queue:
             location = queue.pop(0)
-            if location in seen_locations:
+            if location in seen:
                 continue
-            seen_locations.add(location)
-
+            seen.add(location)
             if location in self.G:
                 expanded.add(location)
-
-            # Any node with node -> located_in -> location is colocated.
             for source, _, data in self.G.in_edges(location, data=True):
                 if data.get(EDGE_ATTR_RELATION) != RelationType.LOCATED_IN.value:
                     continue
-
                 expanded.add(source)
-                source_type = str(self.G.nodes[source].get(NODE_ATTR_TYPE, ""))
-                if source_type == EntityType.REGION.value:
+                if str(self.G.nodes[source].get(NODE_ATTR_TYPE, "")) == EntityType.REGION.value:
                     queue.append(source)
 
         return expanded
 
     # ------------------------------------------------------------------
-    # Core weighted BFS
+    # Core — Modified Dijkstra's with Attenuated Bottleneck Routing
     # ------------------------------------------------------------------
 
-    def _weighted_bfs(
+    def _attenuated_bottleneck_dijkstra(
         self,
-        ground_zero: list[str],
+        ground_zero:   list[str],
         initial_shock: float,
     ) -> tuple[dict[str, float], dict[str, list[str]], dict[str, int]]:
         """
-        Weighted BFS propagation from ground-zero nodes.
+        Modified Dijkstra's algorithm implementing Attenuated Bottleneck Routing.
 
-        Queue entries: (node, current_score, hop_distance, path_so_far)
+        Formula per edge (u → v):
+            F_v = min(F_u, C_{u,v}) · γ
 
-        At each step, for every outgoing edge of the current node that is
-        in PROPAGATION_EDGES and not in BLOCKED_EDGES, compute:
+        Where:
+          F_u     : flow at parent node u (disruption score already settled)
+          C_{u,v} : effective edge capacity
+                      = edge_weight × relation_type_factor
+          γ       : self.decay (global attenuation per hop)
 
-            child_score = current_score
-                          × self.decay
-                          × edge_weight
-                          × relation_type_factor
-
-        where relation_type_factor dampens logistics and location edges
-        relative to direct supply/dependency edges.
+        Algorithm:
+          - Max-heap ordered by current flow (negated for Python's min-heap).
+          - On each pop, if the stored flow is stale (a better path was already
+            found), skip. Otherwise settle the node and relax its neighbours.
+          - This guarantees that the first settlement of any node holds the
+            globally highest-flow path, identical to Dijkstra's shortest-path
+            guarantee but for maximum flow.
 
         Returns
         -------
-        scores        : {node: highest_score_seen}
-        path_traces   : {node: path_from_any_ground_zero}
-        hop_distances : {node: minimum_hop_distance}
+        scores        : {node: highest flow seen}
+        path_traces   : {node: path from any ground-zero node}
+        hop_distances : {node: minimum hop distance}
         """
-        # Initialise with ground-zero nodes at full shock
-        scores:        dict[str, float]      = {}
-        path_traces:   dict[str, list[str]]  = {}
-        hop_distances: dict[str, int]        = {}
+        scores:        dict[str, float]     = {}
+        path_traces:   dict[str, list[str]] = {}
+        hop_distances: dict[str, int]       = {}
 
-        for gz_node in ground_zero:
-            scores[gz_node]        = initial_shock
-            path_traces[gz_node]   = [gz_node]
-            hop_distances[gz_node] = 0
+        # Seed the heap with ground-zero nodes at full initial shock
+        for gz in ground_zero:
+            scores[gz]        = initial_shock
+            path_traces[gz]   = [gz]
+            hop_distances[gz] = 0
 
-        # BFS queue: (node, score, hop, path)
-        queue: list[tuple[str, float, int, list[str]]] = [
-            (node, initial_shock, 0, [node])
-            for node in ground_zero
+        # heap entries: (-flow, hop, node, path)
+        # Negated flow so heappop gives us the node with HIGHEST flow.
+        heap: list[tuple[float, int, str, list[str]]] = [
+            (-initial_shock, 0, gz, [gz]) for gz in ground_zero
         ]
+        heapq.heapify(heap)
 
-        visited_at_score: dict[str, float] = dict(scores)  # prune revisits
+        while heap:
+            neg_flow, hop, node, path = heapq.heappop(heap)
+            current_flow = -neg_flow
 
-        while queue:
-            current_node, current_score, current_hop, current_path = (
-                queue.pop(0)
-            )
-
-            # Depth limit
-            if current_hop >= self.max_hops:
+            # Stale entry — a better path has already settled this node
+            if current_flow < scores.get(node, 0.0):
                 continue
 
-            # Follow every outgoing edge from current node
-            for _, neighbor, edge_data in self.G.out_edges(
-                current_node, data=True
-            ):
+            # Depth limit
+            if hop >= self.max_hops:
+                continue
+
+            for _, neighbor, edge_data in self.G.out_edges(node, data=True):
                 relation = edge_data.get(EDGE_ATTR_RELATION, "")
 
-                # Skip blocked or irrelevant edge types
                 if relation in BLOCKED_EDGES:
                     continue
                 if relation not in PROPAGATION_EDGES:
                     continue
 
-                # Retrieve criticality weight set by Module 1
                 edge_weight = edge_data.get(EDGE_ATTR_WEIGHT, 1.0)
                 if edge_weight == 0.0:
-                    continue  # alternative_to edges (already 0 from builder)
+                    continue
 
-                # Apply relation-type-specific damping
+                # Effective capacity: edge criticality × relation-type damping
                 rel_factor = self._relation_factor(relation)
+                capacity   = edge_weight * rel_factor
 
-                # Compute child score
-                child_score = (
-                    current_score
-                    * self.decay
-                    * edge_weight
-                    * rel_factor
-                )
+                # Attenuated Bottleneck: F_v = min(F_u, C_{u,v}) · γ
+                child_flow = min(current_flow, capacity) * self.decay
 
-                # Prune negligible scores
-                if child_score < self.prune_threshold:
+                if child_flow < self.prune_threshold:
                     continue
 
-                # Only update if we found a higher score path
-                if child_score <= visited_at_score.get(neighbor, 0.0):
+                # Only update if this path delivers a strictly higher flow
+                if child_flow <= scores.get(neighbor, 0.0):
                     continue
 
-                visited_at_score[neighbor] = child_score
-                scores[neighbor]           = child_score
-                new_path                   = current_path + [neighbor]
-                path_traces[neighbor]      = new_path
-                hop_distances[neighbor]    = current_hop + 1
+                scores[neighbor]        = child_flow
+                path_traces[neighbor]   = path + [neighbor]
+                hop_distances[neighbor] = hop + 1
 
-                queue.append(
-                    (neighbor, child_score, current_hop + 1, new_path)
+                heapq.heappush(
+                    heap,
+                    (-child_flow, hop + 1, neighbor, path + [neighbor]),
                 )
 
         return scores, path_traces, hop_distances
 
     def _relation_factor(self, relation: str) -> float:
         """
-        Additional damping multiplier per relation type.
+        Relation-type damping applied to edge capacity C_{u,v}.
 
-        Direct dependencies (supplies, depends_on) propagate at full decay.
-        Logistics (ships_through) propagate at 70% — a port closure hurts
-        but there are usually alternative routes.
-        Geographic co-location (located_in) propagates at 50% — sharing a
-        region creates risk but doesn't mean direct operational dependency.
+        supplies / depends_on : 1.00 — direct operational dependency
+        ships_through         : 0.70 — logistics link (alternative routes exist)
+        located_in            : 0.50 — geographic co-location (indirect risk)
         """
-        if relation in {
-            RelationType.SUPPLIES.value,
-            RelationType.DEPENDS_ON.value,
-        }:
+        if relation in {RelationType.SUPPLIES.value, RelationType.DEPENDS_ON.value}:
             return 1.0
         if relation == RelationType.SHIPS_THROUGH.value:
             return LOGISTICS_DECAY_FACTOR
         if relation == RelationType.LOCATED_IN.value:
             return LOCATION_DECAY_FACTOR
-        return 0.8  # default for any other included relation
+        return 0.8
 
     # ------------------------------------------------------------------
     # Result construction helpers
@@ -516,20 +469,16 @@ class DisruptionPropagator:
         path_traces:   dict[str, list[str]],
         hop_distances: dict[str, int],
     ) -> dict[str, NodeExposure]:
-        """Build a NodeExposure record for every affected node."""
         exposures = {}
         for node, score in scores.items():
             etype = (
                 self.G.nodes[node].get(NODE_ATTR_TYPE, "Unknown")
                 if node in self.G else "Unknown"
             )
-
-            # Check if this node has any alternative_to edges
             has_alt = any(
                 data.get(EDGE_ATTR_RELATION) == RelationType.ALTERNATIVE_TO.value
                 for _, _, data in self.G.out_edges(node, data=True)
             )
-
             exposures[node] = NodeExposure(
                 node=node,
                 score=round(score, 4),
@@ -541,17 +490,10 @@ class DisruptionPropagator:
             )
         return exposures
 
-    def _build_tiers(
-        self, scores: dict[str, float]
-    ) -> dict[str, list[str]]:
-        """Group nodes into severity tiers by score."""
-        tiers: dict[str, list[str]] = {
-            sl.value: [] for sl in SeverityLevel
-        }
+    def _build_tiers(self, scores: dict[str, float]) -> dict[str, list[str]]:
+        tiers: dict[str, list[str]] = {sl.value: [] for sl in SeverityLevel}
         for node, score in scores.items():
-            tier = SeverityLevel.from_score(score).value
-            tiers[tier].append(node)
-        # Sort each tier by score descending
+            tiers[SeverityLevel.from_score(score).value].append(node)
         for tier in tiers:
             tiers[tier].sort(key=lambda n: -scores[n])
         return tiers
@@ -562,21 +504,19 @@ class DisruptionPropagator:
         hop_distances: dict[str, int],
         event:         DisruptionEvent,
     ) -> dict:
-        """Compute summary statistics for the propagation result."""
         if not scores:
             return {"total_affected": 0}
-
-        score_values = list(scores.values())
+        sv = list(scores.values())
         return {
-            "total_affected":    len(scores),
-            "mean_score":        round(sum(score_values) / len(score_values), 4),
-            "max_score":         round(max(score_values), 4),
-            "min_score":         round(min(score_values), 4),
-            "max_hop_reached":   max(hop_distances.values(), default=0),
-            "critical_count":    sum(1 for s in score_values if s >= 0.80),
-            "high_count":        sum(1 for s in score_values if 0.50 <= s < 0.80),
-            "moderate_count":    sum(1 for s in score_values if 0.25 <= s < 0.50),
-            "low_count":         sum(1 for s in score_values if s < 0.25),
-            "event_category":    event.category.value,
-            "initial_shock":     event.initial_shock,
+            "total_affected":  len(scores),
+            "mean_score":      round(sum(sv) / len(sv), 4),
+            "max_score":       round(max(sv), 4),
+            "min_score":       round(min(sv), 4),
+            "max_hop_reached": max(hop_distances.values(), default=0),
+            "critical_count":  sum(1 for s in sv if s >= 0.80),
+            "high_count":      sum(1 for s in sv if 0.50 <= s < 0.80),
+            "moderate_count":  sum(1 for s in sv if 0.25 <= s < 0.50),
+            "low_count":       sum(1 for s in sv if s < 0.25),
+            "event_category":  event.category.value,
+            "initial_shock":   event.initial_shock,
         }

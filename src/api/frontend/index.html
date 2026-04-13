@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Supply Chain Risk Intelligence</title>
+  <style>
+    /* ── Reset & base ──────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px 80px;
+    }
+
+    /* ── Header ────────────────────────────────────────────────────── */
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    header h1 {
+      font-size: 1.9rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: #f0f6fc;
+    }
+    header p {
+      margin-top: 8px;
+      color: #8b949e;
+      font-size: 0.95rem;
+    }
+
+    /* ── Query card ────────────────────────────────────────────────── */
+    .query-card {
+      width: 100%;
+      max-width: 760px;
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 28px 32px;
+    }
+
+    .query-card label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #8b949e;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 10px;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 12px;
+    }
+
+    #queryInput {
+      flex: 1;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      color: #e6edf3;
+      font-size: 1rem;
+      padding: 12px 16px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    #queryInput:focus { border-color: #58a6ff; }
+    #queryInput::placeholder { color: #484f58; }
+
+    #analyzeBtn {
+      background: #238636;
+      border: 1px solid #2ea043;
+      border-radius: 8px;
+      color: #fff;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 12px 26px;
+      transition: background 0.15s, transform 0.1s;
+      white-space: nowrap;
+    }
+    #analyzeBtn:hover  { background: #2ea043; }
+    #analyzeBtn:active { transform: scale(0.97); }
+    #analyzeBtn:disabled { background: #21262d; color: #484f58; cursor: not-allowed; border-color: #30363d; }
+
+    /* ── Status strip ──────────────────────────────────────────────── */
+    #statusStrip {
+      width: 100%;
+      max-width: 760px;
+      margin-top: 10px;
+      min-height: 22px;
+      color: #8b949e;
+      font-size: 0.82rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .spinner {
+      width: 14px; height: 14px;
+      border: 2px solid #30363d;
+      border-top-color: #58a6ff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Report output ─────────────────────────────────────────────── */
+    #reportCard {
+      display: none;
+      width: 100%;
+      max-width: 760px;
+      margin-top: 28px;
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    /* header bar */
+    .report-header {
+      background: #1c2128;
+      padding: 18px 28px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid #30363d;
+    }
+    .report-header h2 {
+      flex: 1;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #f0f6fc;
+      min-width: 160px;
+    }
+
+    /* badges */
+    .badge {
+      border-radius: 6px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .badge-confidence-HIGH     { background: #3d1c1c; color: #f85149; border: 1px solid #6e1c1c; }
+    .badge-confidence-MEDIUM   { background: #2e2a13; color: #e3b341; border: 1px solid #5e4b00; }
+    .badge-confidence-LOW      { background: #132d27; color: #3fb950; border: 1px solid #1a4d3a; }
+    .badge-cache               { background: #1c2128; color: #58a6ff; border: 1px solid #1f6feb; }
+    .badge-evidence            { background: #1c2128; color: #8b949e; border: 1px solid #30363d; }
+
+    /* entity chips */
+    .chips-section { padding: 16px 28px; border-bottom: 1px solid #21262d; }
+    .chips-label   { font-size: 0.75rem; color: #8b949e; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+    .chips         { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      border-radius: 20px;
+      font-size: 0.8rem;
+      padding: 4px 12px;
+      font-weight: 500;
+    }
+    .chip-critical { background: #3d1c1c; color: #f85149; border: 1px solid #6e1c1c; }
+    .chip-high     { background: #2e2a13; color: #e3b341; border: 1px solid #5e4b00; }
+
+    /* exposure table */
+    .exposure-section { padding: 16px 28px; border-bottom: 1px solid #21262d; }
+    .exposure-label   { font-size: 0.75rem; color: #8b949e; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+    .exposure-list    { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+    .exposure-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.88rem;
+    }
+    .exposure-name  { flex: 1; color: #c9d1d9; }
+    .exposure-bar-wrap { flex: 2; background: #21262d; border-radius: 4px; height: 6px; overflow: hidden; }
+    .exposure-bar      { height: 100%; border-radius: 4px; background: #388bfd; }
+    .exposure-score { color: #8b949e; font-size: 0.8rem; width: 36px; text-align: right; }
+
+    /* report text */
+    .report-body { padding: 24px 28px; }
+    .report-body h3 {
+      color: #58a6ff;
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 6px;
+      margin-top: 20px;
+    }
+    .report-body h3:first-child { margin-top: 0; }
+    .report-body p, .report-body pre {
+      color: #c9d1d9;
+      font-size: 0.91rem;
+      line-height: 1.65;
+      white-space: pre-wrap;
+      font-family: inherit;
+    }
+    .report-body .section-divider { border: none; border-top: 1px solid #21262d; margin: 20px 0; }
+
+    /* ── Error state ───────────────────────────────────────────────── */
+    .error-card {
+      display: none;
+      width: 100%;
+      max-width: 760px;
+      margin-top: 20px;
+      background: #3d1c1c;
+      border: 1px solid #6e1c1c;
+      border-radius: 10px;
+      padding: 16px 20px;
+      color: #f85149;
+      font-size: 0.88rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Supply Chain Risk Intelligence</h1>
+    <p>Graph RAG-powered disruption analysis over the S&amp;P 500 supply network</p>
+  </header>
+
+  <!-- Query input -->
+  <div class="query-card">
+    <label for="queryInput">Ask a what-if question about the electronics supply chain</label>
+    <div class="input-row">
+      <input
+        id="queryInput"
+        type="text"
+        placeholder="What if Taiwan has a conflict?"
+        value=""
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <button id="analyzeBtn" onclick="analyze()">Analyze</button>
+    </div>
+  </div>
+
+  <div id="statusStrip"></div>
+  <div class="error-card" id="errorCard"></div>
+
+  <!-- Report output (hidden until a result arrives) -->
+  <div id="reportCard">
+    <div class="report-header">
+      <h2 id="reportTitle">—</h2>
+      <span class="badge badge-confidence-HIGH" id="confidenceBadge">—</span>
+      <span class="badge badge-cache" id="cacheBadge" style="display:none">⚡ Cached</span>
+      <span class="badge badge-evidence" id="evidenceBadge">0 records</span>
+    </div>
+
+    <!-- Critical / High entity chips -->
+    <div class="chips-section" id="chipsSection" style="display:none">
+      <div class="chips-label">Directly Affected Entities</div>
+      <div class="chips" id="chipsContainer"></div>
+    </div>
+
+    <!-- Top exposed bar chart -->
+    <div class="exposure-section" id="exposureSection" style="display:none">
+      <div class="exposure-label">Top Exposed Nodes</div>
+      <ul class="exposure-list" id="exposureList"></ul>
+    </div>
+
+    <!-- Full report text -->
+    <div class="report-body" id="reportBody"></div>
+  </div>
+
+  <script>
+    const API = "";   // same origin; set to "http://localhost:8000" if running separately
+
+    async function analyze() {
+      const query = document.getElementById("queryInput").value.trim();
+      if (!query) return;
+
+      setStatus("loading", "Analyzing...");
+      setError(null);
+      hideReport();
+
+      document.getElementById("analyzeBtn").disabled = true;
+
+      try {
+        const res = await fetch(`${API}/analyze`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query }),
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({ detail: res.statusText }));
+          throw new Error(err.detail || res.statusText);
+        }
+
+        const data = await res.json();
+        renderReport(data);
+        setStatus("idle", "");
+      } catch (e) {
+        setError(e.message || "Request failed");
+        setStatus("idle", "");
+      } finally {
+        document.getElementById("analyzeBtn").disabled = false;
+      }
+    }
+
+    function renderReport(data) {
+      // Header
+      document.getElementById("reportTitle").textContent = data.event_name;
+
+      const confBadge = document.getElementById("confidenceBadge");
+      confBadge.textContent = `Confidence: ${data.confidence}`;
+      confBadge.className   = `badge badge-confidence-${data.confidence}`;
+
+      const cacheBadge = document.getElementById("cacheBadge");
+      cacheBadge.style.display = data.from_cache ? "inline-block" : "none";
+
+      document.getElementById("evidenceBadge").textContent =
+        `Evidence: ${data.evidence_count} records`;
+
+      // Entity chips
+      const allAffected = [
+        ...data.critical_nodes.map(n => ({ name: n, tier: "critical" })),
+        ...data.high_nodes.map(n => ({ name: n, tier: "high" })),
+      ];
+
+      const chipsSection = document.getElementById("chipsSection");
+      const chips        = document.getElementById("chipsContainer");
+      chips.innerHTML    = "";
+
+      if (allAffected.length > 0) {
+        allAffected.forEach(({ name, tier }) => {
+          const chip = document.createElement("span");
+          chip.className   = `chip chip-${tier}`;
+          chip.textContent = name;
+          chips.appendChild(chip);
+        });
+        chipsSection.style.display = "block";
+      } else {
+        chipsSection.style.display = "none";
+      }
+
+      // Exposure bars
+      const exposureSection = document.getElementById("exposureSection");
+      const exposureList    = document.getElementById("exposureList");
+      exposureList.innerHTML = "";
+
+      if (data.top_exposed && data.top_exposed.length > 0) {
+        const maxScore = data.top_exposed[0].score || 1;
+        data.top_exposed.slice(0, 8).forEach(({ name, score }) => {
+          const pct  = Math.round((score / maxScore) * 100);
+          const item = document.createElement("li");
+          item.className = "exposure-item";
+          item.innerHTML = `
+            <span class="exposure-name">${escHtml(name)}</span>
+            <span class="exposure-bar-wrap">
+              <span class="exposure-bar" style="width:${pct}%"></span>
+            </span>
+            <span class="exposure-score">${score.toFixed(2)}</span>
+          `;
+          exposureList.appendChild(item);
+        });
+        exposureSection.style.display = "block";
+      } else {
+        exposureSection.style.display = "none";
+      }
+
+      // Report text — parse sections from the raw report string
+      const reportBody = document.getElementById("reportBody");
+      reportBody.innerHTML = formatReportText(data.risk_report || "");
+
+      // Show the card
+      document.getElementById("reportCard").style.display = "block";
+    }
+
+    function formatReportText(text) {
+      // Strip the leading prompt header up to "--- RISK REPORT ---"
+      const markerIdx = text.indexOf("--- RISK REPORT ---");
+      if (markerIdx !== -1) text = text.slice(markerIdx + 20).trim();
+
+      // Render XML-style section tags as section headers
+      const sections = {
+        critical_entities:     "Critical Entities",
+        dependency_chains:     "Dependency Chains",
+        critical_edges:        "Critical Edges",
+        mitigations:           "Alternative Suppliers & Mitigations",
+        resilience_assessment: "Resilience Assessment",
+      };
+
+      let rendered = text;
+      Object.entries(sections).forEach(([tag, label]) => {
+        const re = new RegExp(`<${tag}>([\\s\\S]*?)<\\/${tag}>`, "i");
+        rendered = rendered.replace(re, (_, content) =>
+          `<h3>${label}</h3><hr class="section-divider"><p>${escHtml(content.trim())}</p>`
+        );
+      });
+
+      // If none of the XML tags were found, just show the raw text
+      if (!rendered.includes("<h3>")) {
+        rendered = `<p>${escHtml(rendered)}</p>`;
+      }
+
+      return rendered;
+    }
+
+    function escHtml(str) {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    function setStatus(state, msg) {
+      const strip = document.getElementById("statusStrip");
+      if (state === "loading") {
+        strip.innerHTML = `<div class="spinner"></div><span>${msg}</span>`;
+      } else {
+        strip.innerHTML = msg
+          ? `<span style="color:#3fb950">${msg}</span>`
+          : "";
+      }
+    }
+
+    function setError(msg) {
+      const el = document.getElementById("errorCard");
+      if (msg) {
+        el.style.display = "block";
+        el.textContent   = `Error: ${msg}`;
+      } else {
+        el.style.display = "none";
+      }
+    }
+
+    function hideReport() {
+      document.getElementById("reportCard").style.display = "none";
+    }
+
+    // Submit on Enter key
+    document.getElementById("queryInput").addEventListener("keydown", e => {
+      if (e.key === "Enter") analyze();
+    });
+  </script>
+</body>
+</html>
