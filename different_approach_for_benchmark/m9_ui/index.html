@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Supply Chain Risk Analyzer</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #1a1d2e;
+      border-bottom: 1px solid #2d3148;
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    header h1 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+
+    header .badge {
+      font-size: 11px;
+      background: #2d3148;
+      color: #818cf8;
+      padding: 3px 8px;
+      border-radius: 4px;
+      border: 1px solid #3d4168;
+    }
+
+    #health {
+      margin-left: auto;
+      font-size: 12px;
+      color: #64748b;
+    }
+    #health.ok { color: #34d399; }
+    #health.err { color: #f87171; }
+
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+
+    .search-box {
+      background: #1a1d2e;
+      border: 1px solid #2d3148;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 32px;
+    }
+
+    .search-box h2 {
+      font-size: 14px;
+      font-weight: 500;
+      color: #94a3b8;
+      margin-bottom: 12px;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    #query-input {
+      flex: 1;
+      background: #0f1117;
+      border: 1px solid #2d3148;
+      border-radius: 8px;
+      padding: 12px 16px;
+      color: #e2e8f0;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    #query-input:focus { border-color: #818cf8; }
+    #query-input::placeholder { color: #475569; }
+
+    button {
+      background: #6366f1;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    button:hover { background: #5253cc; }
+    button:disabled { background: #374151; color: #6b7280; cursor: not-allowed; }
+
+    .examples {
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .example-chip {
+      font-size: 12px;
+      background: #0f1117;
+      border: 1px solid #2d3148;
+      color: #94a3b8;
+      padding: 5px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .example-chip:hover { border-color: #818cf8; color: #c7d2fe; }
+
+    #status-bar {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      background: #1a1d2e;
+      border: 1px solid #2d3148;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      font-size: 13px;
+      color: #94a3b8;
+    }
+    #status-bar.visible { display: flex; }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid #2d3148;
+      border-top-color: #818cf8;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .meta-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .meta-pill {
+      font-size: 12px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      border: 1px solid;
+    }
+    .meta-pill.intent  { background: #1e1b4b; border-color: #4338ca; color: #a5b4fc; }
+    .meta-pill.entity  { background: #14532d; border-color: #166534; color: #86efac; }
+    .meta-pill.conf-High   { background: #14532d; border-color: #166534; color: #86efac; }
+    .meta-pill.conf-Medium { background: #78350f; border-color: #92400e; color: #fcd34d; }
+    .meta-pill.conf-Low    { background: #450a0a; border-color: #7f1d1d; color: #fca5a5; }
+
+    #report {
+      background: #1a1d2e;
+      border: 1px solid #2d3148;
+      border-radius: 12px;
+      padding: 28px 32px;
+      line-height: 1.7;
+    }
+
+    /* Markdown styles inside report */
+    #report h1 { font-size: 22px; margin-bottom: 8px; color: #e2e8f0; }
+    #report h2 { font-size: 16px; font-weight: 600; color: #818cf8;
+                 margin-top: 24px; margin-bottom: 8px; padding-bottom: 4px;
+                 border-bottom: 1px solid #2d3148; }
+    #report p  { color: #cbd5e1; margin-bottom: 10px; }
+    #report ul { padding-left: 20px; margin-bottom: 10px; }
+    #report li { color: #cbd5e1; margin-bottom: 4px; }
+    #report strong { color: #e2e8f0; }
+    #report code  { background: #0f1117; padding: 2px 6px; border-radius: 4px;
+                    font-size: 13px; color: #a5f3fc; }
+    #report blockquote { border-left: 3px solid #f87171; padding-left: 12px;
+                         color: #fca5a5; margin: 12px 0; }
+
+    #context-toggle {
+      margin-top: 20px;
+      text-align: right;
+    }
+    #context-toggle button {
+      background: transparent;
+      border: 1px solid #2d3148;
+      color: #64748b;
+      font-size: 12px;
+      padding: 6px 14px;
+    }
+    #context-toggle button:hover { border-color: #4b5563; color: #94a3b8; }
+
+    #raw-context {
+      display: none;
+      margin-top: 12px;
+      background: #0f1117;
+      border: 1px solid #2d3148;
+      border-radius: 8px;
+      padding: 16px;
+      font-family: "JetBrains Mono", "Fira Code", monospace;
+      font-size: 12px;
+      color: #64748b;
+      white-space: pre-wrap;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    #raw-context.visible { display: block; }
+
+    #error-box {
+      display: none;
+      background: #450a0a;
+      border: 1px solid #7f1d1d;
+      border-radius: 8px;
+      padding: 16px;
+      color: #fca5a5;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+    #error-box.visible { display: block; }
+  </style>
+</head>
+<body>
+
+<header>
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2">
+    <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
+    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+  </svg>
+  <h1>Supply Chain Risk Analyzer</h1>
+  <span class="badge">GraphRAG</span>
+  <span id="health">checking graph…</span>
+</header>
+
+<main>
+  <div class="search-box">
+    <h2>Ask a what-if question about the electronics supply chain</h2>
+    <div class="input-row">
+      <input id="query-input" type="text"
+             placeholder="What if TSMC stops production?"
+             autocomplete="off" />
+      <button id="ask-btn" onclick="submitQuery()">Analyze</button>
+    </div>
+    <div class="examples">
+      <span class="example-chip" onclick="setQuery(this)">What if TSMC stops production?</span>
+      <span class="example-chip" onclick="setQuery(this)">What if China bans gallium exports?</span>
+      <span class="example-chip" onclick="setQuery(this)">What companies supply components for iPhone?</span>
+      <span class="example-chip" onclick="setQuery(this)">What if Taiwan has a conflict?</span>
+      <span class="example-chip" onclick="setQuery(this)">What if rare earth supply is cut?</span>
+    </div>
+  </div>
+
+  <div id="error-box"></div>
+  <div id="status-bar"><div class="spinner"></div><span id="status-msg">Querying knowledge graph…</span></div>
+
+  <div id="result" style="display:none">
+    <div class="meta-row" id="meta-row"></div>
+    <div id="report"></div>
+    <div id="context-toggle">
+      <button onclick="toggleContext()">Show raw graph context</button>
+    </div>
+    <pre id="raw-context"></pre>
+  </div>
+</main>
+
+<script>
+  const API = "http://localhost:8000";
+
+  // ---- health check
+  async function checkHealth() {
+    const el = document.getElementById("health");
+    try {
+      const r = await fetch(`${API}/health`);
+      const d = await r.json();
+      if (d.status === "ok") {
+        el.textContent = `Graph: ${d.nodes} nodes · ${d.edges} edges`;
+        el.className = "ok";
+      } else {
+        el.textContent = "Graph error";
+        el.className = "err";
+      }
+    } catch {
+      el.textContent = "API offline";
+      el.className = "err";
+    }
+  }
+  checkHealth();
+
+  function setQuery(el) {
+    document.getElementById("query-input").value = el.textContent;
+    document.getElementById("query-input").focus();
+  }
+
+  document.getElementById("query-input").addEventListener("keydown", e => {
+    if (e.key === "Enter") submitQuery();
+  });
+
+  async function submitQuery() {
+    const q = document.getElementById("query-input").value.trim();
+    if (!q) return;
+
+    // Reset UI
+    document.getElementById("result").style.display = "none";
+    document.getElementById("error-box").className = "";
+    document.getElementById("error-box").style.display = "none";
+    document.getElementById("raw-context").className = "";
+    setStatus(true, "Querying knowledge graph…");
+
+    const btn = document.getElementById("ask-btn");
+    btn.disabled = true;
+
+    try {
+      setStatus(true, "Retrieving relevant subgraph…");
+      const res = await fetch(`${API}/query`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: q }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.detail || `HTTP ${res.status}`);
+      }
+
+      setStatus(true, "Generating impact report…");
+      const data = await res.json();
+      setStatus(false);
+      renderResult(data);
+
+    } catch (e) {
+      setStatus(false);
+      showError(e.message);
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  function renderResult(data) {
+    // Meta pills
+    const meta = document.getElementById("meta-row");
+    meta.innerHTML = `
+      <span class="meta-pill intent">Intent: ${data.intent_type.replace(/_/g," ")}</span>
+      <span class="meta-pill entity">Entity: ${data.query_entity || "—"}</span>
+      <span class="meta-pill conf-${data.confidence}">Confidence: ${data.confidence}</span>
+      <span class="meta-pill intent">Evidence: ${data.evidence_count} records</span>
+    `;
+
+    // Render markdown report
+    document.getElementById("report").innerHTML = marked.parse(data.report || "");
+
+    // Store raw context
+    document.getElementById("raw-context").textContent = data.context;
+
+    document.getElementById("result").style.display = "block";
+    document.getElementById("result").scrollIntoView({ behavior: "smooth" });
+  }
+
+  function toggleContext() {
+    const el = document.getElementById("raw-context");
+    const btn = document.querySelector("#context-toggle button");
+    if (el.classList.contains("visible")) {
+      el.classList.remove("visible");
+      btn.textContent = "Show raw graph context";
+    } else {
+      el.classList.add("visible");
+      btn.textContent = "Hide raw graph context";
+    }
+  }
+
+  function setStatus(visible, msg) {
+    const bar = document.getElementById("status-bar");
+    if (visible) {
+      document.getElementById("status-msg").textContent = msg;
+      bar.className = "visible";
+    } else {
+      bar.className = "";
+    }
+  }
+
+  function showError(msg) {
+    const el = document.getElementById("error-box");
+    el.textContent = `Error: ${msg}`;
+    el.style.display = "block";
+    el.className = "visible";
+  }
+</script>
+</body>
+</html>
