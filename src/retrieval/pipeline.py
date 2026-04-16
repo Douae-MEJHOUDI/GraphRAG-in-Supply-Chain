@@ -37,21 +37,31 @@ from typing import Optional
 
 import networkx as nx
 
+import numpy as np
+
 from src.embeddings.encoder   import NodeEncoder
 from src.retrieval.retriever  import SubgraphRetriever, RetrievedSubgraph
 from src.retrieval.community  import CommunitySummarizer, Community
 
 
 # ---------------------------------------------------------------------------
-# Query type detection keywords
+# Query type classification — prototype embeddings
 # ---------------------------------------------------------------------------
 
-GLOBAL_QUERY_SIGNALS = {
-    "overall", "across", "all", "entire", "whole", "total", "every",
-    "concentration", "broad", "general", "summary", "overview",
-    "most exposed", "biggest risk", "main risks", "key vulnerabilities",
-    "which regions", "which countries", "compare",
-}
+# Number of community summaries to inject into the prompt for global queries.
+GLOBAL_TOP_K_COMMUNITIES = 3
+
+# Representative texts for each query type.
+# The encoder embeds these once at construction time; every incoming query
+# is then classified by cosine similarity to these prototypes.
+_GLOBAL_PROTOTYPE = (
+    "What is the overall, broad supply chain risk exposure across all regions, "
+    "sectors, and entities? Give me a summary of the entire network."
+)
+_LOCAL_PROTOTYPE = (
+    "Which specific supplier, company, or entity is affected by this event? "
+    "Trace the dependency path for this particular node."
+)
 
 
 # ---------------------------------------------------------------------------
@@ -120,6 +130,11 @@ class GraphRAGPipeline:
 
         self._communities_built = False
 
+        # Pre-compute prototype embeddings for query-type classification.
+        # Done once at construction so classify_query() costs only a dot-product.
+        self._global_proto: np.ndarray = encoder.encode_query(_GLOBAL_PROTOTYPE)
+        self._local_proto:  np.ndarray = encoder.encode_query(_LOCAL_PROTOTYPE)
+
     # ------------------------------------------------------------------
     # Setup — build community summaries (one-time, cacheable)
     # ------------------------------------------------------------------
@@ -181,7 +196,9 @@ class GraphRAGPipeline:
         community_text = ""
 
         if query_type == "global" and self._communities_built:
-            communities  = self.summarizer.find_relevant_communities(query, top_k=3)
+            communities  = self.summarizer.find_relevant_communities(
+                query, top_k=GLOBAL_TOP_K_COMMUNITIES, encoder=self.encoder
+            )
             community_text = self.summarizer.format_for_prompt(communities)
 
         # Merge into single prompt context block
@@ -246,15 +263,20 @@ class GraphRAGPipeline:
 
     def _classify_query(self, query: str) -> str:
         """
-        Classify a query as "local" or "global" based on keyword signals.
+        Classify a query as "local" or "global" using embedding similarity.
 
-        Local  → asks about a specific entity or event
-        Global → asks about the whole supply chain or broad themes
+        The query is encoded and compared (cosine similarity) against two
+        pre-computed prototype vectors — one representing a typical global
+        question and one representing a typical local question.
+        Whichever prototype is closer determines the type.
+
+        Local  → asks about a specific entity, supplier, or dependency path
+        Global → asks about the whole supply chain or broad cross-cutting themes
         """
-        tokens = set(query.lower().split())
-        if tokens & GLOBAL_QUERY_SIGNALS:
-            return "global"
-        return "local"
+        query_emb   = self.encoder.encode_query(query)   # (dim,), L2-normalised
+        global_sim  = float(np.dot(query_emb, self._global_proto))
+        local_sim   = float(np.dot(query_emb, self._local_proto))
+        return "global" if global_sim > local_sim else "local"
 
     # ------------------------------------------------------------------
     # Inspection helpers

@@ -29,6 +29,14 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
+
+# Load .env from the project root (two levels up from src/api/).
+# This must run before any module that reads os.environ for API keys.
+try:
+    from dotenv import load_dotenv
+    load_dotenv(Path(__file__).resolve().parents[2] / ".env")
+except ImportError:
+    pass  # python-dotenv not installed — fall back to shell environment
 from typing import Optional
 
 from fastapi import FastAPI, HTTPException
@@ -100,10 +108,11 @@ def create_app() -> FastAPI:
 
     # Serve the static frontend files
     frontend_dir = Path(__file__).parent / "frontend"
-    if frontend_dir.exists():
+    static_dir = frontend_dir / "static"
+    if static_dir.exists():
         app.mount(
             "/static",
-            StaticFiles(directory=str(frontend_dir / "static")),
+            StaticFiles(directory=str(static_dir)),
             name="static",
         )
 
@@ -166,11 +175,15 @@ def create_app() -> FastAPI:
             event = _auto_detect_event(req.query)
             event_name = event.name
 
-        # Check cache before calling full pipeline
-        from_cache = pipe.cache.lookup(req.query) is not None
+        # Single lookup — reuse the hit to determine from_cache and skip
+        # the redundant second lookup that pipe.run() would otherwise do.
+        cache_hit = pipe.cache.lookup(req.query)
+        from_cache = cache_hit is not None
 
-        # Run (cache hit returns instantly; miss runs the full pipeline)
-        result = pipe.run(event=event, query=req.query)
+        if cache_hit is not None:
+            result = cache_hit.report
+        else:
+            result = pipe.run(event=event, query=req.query)
 
         # Build confidence label from initial_shock
         shock = result.get("initial_shock", 0.5)
@@ -212,16 +225,43 @@ def create_app() -> FastAPI:
 
 def _auto_detect_event(query: str):
     """
-    Simple keyword-based event detection.
-    Falls back to the first scenario in SCENARIO_LIBRARY if nothing matches.
+    Keyword-based event detection with word-boundary matching and scoring.
+
+    Scores each scenario by counting how many of its keywords appear as whole
+    words in the query.  Keywords are drawn from:
+      - the scenario dict key   ("asml_export_ban" → ["asml","export","ban"])
+      - the event name          ("ASML Export Restriction" → ["asml","export","restriction"])
+      - content words (≥4 chars) from the description
+
+    Word-boundary matching (\\b) prevents "ban" from matching "bankrupt", etc.
+    The highest-scoring scenario wins; ties go to the first in insertion order.
+    Falls back to the first scenario only when nothing scores at all.
     """
+    import re as _re
+
     q = query.lower()
+    best_event = None
+    best_score = 0
+
     for key, event in SCENARIO_LIBRARY.items():
-        keywords = [w.lower() for w in key.replace("_", " ").split()]
-        if any(kw in q for kw in keywords):
-            return event
-    # Fallback to first scenario
-    return next(iter(SCENARIO_LIBRARY.values()))
+        # Keyword sources: scenario key + event name + description content words
+        key_words  = key.replace("_", " ").lower().split()
+        name_words = _re.split(r"\W+", event.name.lower())
+        desc_words = [w for w in _re.split(r"\W+", event.description.lower())
+                      if len(w) >= 4]
+
+        keywords = set(key_words + name_words + desc_words) - {""}
+
+        score = sum(
+            1 for kw in keywords
+            if _re.search(r"\b" + _re.escape(kw) + r"\b", q)
+        )
+
+        if score > best_score:
+            best_score = score
+            best_event = event
+
+    return best_event if best_event is not None else next(iter(SCENARIO_LIBRARY.values()))
 
 
 # ---------------------------------------------------------------------------

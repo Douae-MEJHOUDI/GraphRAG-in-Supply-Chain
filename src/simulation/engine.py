@@ -37,8 +37,21 @@ import networkx as nx
 from src.retrieval.pipeline    import GraphRAGPipeline, GraphRAGResult
 from src.retrieval.retriever   import RetrievedSubgraph
 from src.simulation.events     import DisruptionEvent, SeverityLevel
-from src.simulation.propagator import DisruptionPropagator, PropagationResult
+from src.simulation.propagator import DisruptionPropagator, PropagationResult, DEFAULT_DECAY, DEFAULT_MAX_HOPS
 from src.graph.schema          import NODE_ATTR_TYPE, EDGE_ATTR_RELATION, EDGE_ATTR_WEIGHT
+
+
+# ---------------------------------------------------------------------------
+# Score-merging weights  (retrieval relevance vs disruption exposure)
+# Must sum to 1.0.
+# ---------------------------------------------------------------------------
+
+RETRIEVAL_WEIGHT   = 0.5   # weight of GraphRAG retrieval score in merged signal
+DISRUPTION_WEIGHT  = 0.5   # weight of disruption propagation score in merged signal
+
+# Edge weight threshold above which a dependency is flagged as a single-source
+# critical link (no meaningful alternative supplier path exists).
+CRITICAL_EDGE_THRESHOLD = 0.95
 
 
 # ---------------------------------------------------------------------------
@@ -109,8 +122,8 @@ class SimulationEngine:
         self,
         graph:    nx.DiGraph,
         pipeline: GraphRAGPipeline,
-        decay:    float = 0.60,
-        max_hops: int   = 5,
+        decay:    float = DEFAULT_DECAY,
+        max_hops: int   = DEFAULT_MAX_HOPS,
     ):
         self.G          = graph
         self.pipeline   = pipeline
@@ -151,6 +164,10 @@ class SimulationEngine:
             )
 
         print(f"\n[Engine] === Simulation: {event.name} ===")
+
+        # Step 0 — Semantically resolve any ground-zero node names that are
+        # not exact matches in the graph (e.g. "ASML" → "ASML Holding NV").
+        event = self._resolve_event_nodes(event)
 
         # Step 1 — Propagate disruption through the graph
         print("[Engine] Step 1: Propagating disruption...")
@@ -203,6 +220,52 @@ class SimulationEngine:
         ]
 
     # ------------------------------------------------------------------
+    # Ground-zero semantic resolution
+    # ------------------------------------------------------------------
+
+    def _resolve_event_nodes(self, event: DisruptionEvent) -> DisruptionEvent:
+        """
+        Return a copy of *event* with ground_zero names that are guaranteed
+        to exist in the graph.
+
+        For each name in event.ground_zero:
+          - If it already exists in the graph → keep it as-is.
+          - Otherwise → use the encoder's FAISS index to find the top-1
+            semantically closest node and use that instead.
+
+        This uses the same embedding model already loaded for retrieval,
+        so there is no extra model cost.
+        """
+        encoder = self.pipeline.encoder
+        resolved: list[str] = []
+
+        for name in event.ground_zero:
+            if name in self.G:
+                resolved.append(name)
+                continue
+
+            # Semantic search: query is the entity name itself
+            hits = encoder.search(name, k=1)
+            if hits:
+                best_node, score = hits[0]
+                print(
+                    f"[Engine] Ground-zero '{name}' not in graph — "
+                    f"resolved to '{best_node}' (similarity={score:.4f})"
+                )
+                resolved.append(best_node)
+            else:
+                print(
+                    f"[Engine] Warning: '{name}' not in graph and encoder "
+                    f"returned no candidates — skipping"
+                )
+
+        if resolved == event.ground_zero:
+            return event   # nothing changed, reuse original
+
+        from dataclasses import replace
+        return replace(event, ground_zero=resolved)
+
+    # ------------------------------------------------------------------
     # Score merging
     # ------------------------------------------------------------------
 
@@ -227,7 +290,7 @@ class SimulationEngine:
         for node in all_nodes:
             r = retrieval_scores.get(node, 0.0)
             d = disruption_scores.get(node, 0.0)
-            merged[node] = round(0.5 * r + 0.5 * d, 4)
+            merged[node] = round(RETRIEVAL_WEIGHT * r + DISRUPTION_WEIGHT * d, 4)
 
         return merged
 
@@ -315,7 +378,7 @@ class SimulationEngine:
                 rel = edata.get(EDGE_ATTR_RELATION, "?")
                 wt  = edata.get(EDGE_ATTR_WEIGHT, 1.0)
                 t_d = propagation.scores.get(target, 0.0)
-                crit_flag = " *** CRITICAL - single source ***" if wt >= 0.95 else ""
+                crit_flag = " *** CRITICAL - single source ***" if wt >= CRITICAL_EDGE_THRESHOLD else ""
                 lines.append(
                     f"  → {rel} {target}"
                     f" (edge_weight={wt:.2f}, target_disruption={t_d:.3f})"

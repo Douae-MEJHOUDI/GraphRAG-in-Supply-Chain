@@ -59,6 +59,19 @@ DEFAULT_HOP_RADIUS  = 2     # ego-graph radius (2 = node + neighbours + their ne
 DEFAULT_MAX_NODES   = 40    # cap on subgraph size to keep prompts manageable
 MIN_SEMANTIC_SCORE  = 0.20  # discard FAISS results below this similarity
 
+# Fusion score weights (semantic relevance vs structural centrality).
+# Must sum to 1.0.
+SEM_WEIGHT    = 0.6   # weight of FAISS semantic similarity in node score
+STRUCT_WEIGHT = 0.4   # weight of degree centrality in node score
+
+# Per-hop semantic score decay for nodes not directly returned by FAISS.
+# A node 1 hop from a seed gets SEM_WEIGHT * HOP_DECAY^1, 2 hops → ^2, etc.
+HOP_DECAY = 0.5
+
+# Edge weight threshold above which a dependency is flagged as a single-source
+# critical link (no meaningful alternative supplier path exists).
+CRITICAL_EDGE_THRESHOLD = 0.95
+
 
 # ---------------------------------------------------------------------------
 # Return type
@@ -115,6 +128,10 @@ class SubgraphRetriever:
         self.hop_radius    = hop_radius
         self.max_nodes     = max_nodes
         self.min_sem_score = min_sem_score
+
+        # Pre-compute once — both are graph-invariant and used on every query.
+        self._G_undirected:    nx.Graph       = graph.to_undirected()
+        self._degree_centrality: dict[str, float] = nx.degree_centrality(graph)
 
     # ------------------------------------------------------------------
     # Public API
@@ -226,13 +243,12 @@ class SubgraphRetriever:
         if not seed_nodes:
             return set()
 
-        G_undirected = self.G.to_undirected()
         all_candidates: set[str] = set()
 
         for seed in seed_nodes:
-            if seed not in G_undirected:
+            if seed not in self._G_undirected:
                 continue
-            ego = nx.ego_graph(G_undirected, seed, radius=self.hop_radius)
+            ego = nx.ego_graph(self._G_undirected, seed, radius=self.hop_radius)
             all_candidates.update(ego.nodes())
 
         return all_candidates
@@ -268,8 +284,8 @@ class SubgraphRetriever:
         # Pre-compute hop distances from any seed (BFS on undirected graph)
         hop_distances = self._bfs_from_seeds(seed_nodes)
 
-        # Normalize degree centrality across the full graph
-        degree_centrality = nx.degree_centrality(self.G)
+        # Use pre-computed degree centrality (graph-invariant, cached at init)
+        degree_centrality = self._degree_centrality
 
         scores: dict[str, float] = {}
 
@@ -279,13 +295,12 @@ class SubgraphRetriever:
                 sem = semantic_scores[node]
             else:
                 dist = hop_distances.get(node, 99)
-                # Decay by 50% per hop from nearest seed
-                sem = 1.0 * (0.5 ** dist)
+                sem = HOP_DECAY ** dist
 
             # Structural component — degree centrality, normalized to [0,1]
             struct = degree_centrality.get(node, 0.0)
 
-            combined = round(0.6 * sem + 0.4 * struct, 4)
+            combined = round(SEM_WEIGHT * sem + STRUCT_WEIGHT * struct, 4)
             scores[node] = combined
 
         return scores
@@ -295,16 +310,16 @@ class SubgraphRetriever:
         BFS from all seed nodes simultaneously.
         Returns {node: minimum_hop_distance_from_any_seed}.
         """
-        G_und = self.G.to_undirected()
-        distances: dict[str, int] = {s: 0 for s in seed_nodes if s in G_und}
-        queue = list(distances.keys())
+        from collections import deque
+        distances: dict[str, int] = {s: 0 for s in seed_nodes if s in self._G_undirected}
+        queue: deque[str] = deque(distances.keys())
 
         while queue:
-            current = queue.pop(0)
+            current = queue.popleft()
             current_dist = distances[current]
             if current_dist >= self.hop_radius:
                 continue
-            for nbr in G_und.neighbors(current):
+            for nbr in self._G_undirected.neighbors(current):
                 if nbr not in distances:
                     distances[nbr] = current_dist + 1
                     queue.append(nbr)
@@ -373,7 +388,7 @@ class SubgraphRetriever:
             for _, target, edata in subgraph.out_edges(node, data=True):
                 rel = edata.get(EDGE_ATTR_RELATION, "?")
                 wt  = edata.get(EDGE_ATTR_WEIGHT, 1.0)
-                crit = " [CRITICAL - no alternative]" if wt >= 0.95 else ""
+                crit = " [CRITICAL - no alternative]" if wt >= CRITICAL_EDGE_THRESHOLD else ""
                 lines.append(f"  → {rel} {target} (weight={wt:.2f}){crit}")
 
             # Incoming edges (what others do TO this node)

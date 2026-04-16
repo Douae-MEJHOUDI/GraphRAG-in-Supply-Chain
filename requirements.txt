@@ -16,6 +16,7 @@ pyvis==0.3.2
 numpy==1.26.4
 tqdm==4.66.4
 requests==2.32.3
+python-dotenv==1.0.1             # load ANTHROPIC_API_KEY and other secrets from .env
 
 # ── Notebook ──────────────────────────────────────────────────────────────────
 jupyter==1.0.0

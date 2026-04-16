@@ -45,6 +45,7 @@ import networkx as nx
 
 from src.cache.semantic_cache   import CachedPipeline, SemanticCache
 from src.embeddings.encoder     import NodeEncoder, DEFAULT_MODEL
+from src.generation.generator   import RiskReportGenerator
 from src.retrieval.pipeline     import GraphRAGPipeline
 from src.simulation.engine      import SimulationEngine
 
@@ -75,6 +76,8 @@ def build_pipeline(
     seed_k:           int   = 5,
     hop_radius:       int   = 2,
     max_nodes:        int   = 40,
+    llm_backend:      str   = "anthropic",
+    llm_model:        str   = "claude-sonnet-4-6",
 ) -> CachedPipeline:
     """
     Build and return a fully wired CachedPipeline.
@@ -87,7 +90,8 @@ def build_pipeline(
          python -m src.embeddings.reindex_bge
     3. Build the GraphRAGPipeline (loads pre-computed communities if available).
     4. Build the SimulationEngine (Attenuated Bottleneck Routing, γ=decay).
-    5. Wrap with SemanticCache → CachedPipeline.
+    5. Build the RiskReportGenerator (calls Claude to produce the report).
+    6. Wrap with SemanticCache → CachedPipeline.
 
     Parameters
     ----------
@@ -101,6 +105,8 @@ def build_pipeline(
     seed_k           : top-K FAISS seeds per query (default 5)
     hop_radius       : ego-graph expansion radius (default 2)
     max_nodes        : subgraph size cap (default 40)
+    llm_backend      : LLM backend — "anthropic" | "openai" | "ollama"
+    llm_model        : model name string passed to the backend
 
     Returns
     -------
@@ -147,8 +153,11 @@ def build_pipeline(
         max_hops=max_hops,
     )
 
-    # 5 — Semantic cache
+    # 5 — Risk report generator (calls Claude / OpenAI / Ollama)
+    generator = RiskReportGenerator(backend=llm_backend, model=llm_model)
+
+    # 6 — Semantic cache
     cache = SemanticCache(cache_dir=cache_dir, threshold=cache_threshold)
 
     print("[run] Pipeline ready.")
-    return CachedPipeline(engine=engine, cache=cache)
+    return CachedPipeline(engine=engine, cache=cache, generator=generator)

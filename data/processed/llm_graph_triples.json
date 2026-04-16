@@ -1,0 +1,102 @@
+[
+  {
+    "head": "TSMC",
+    "head_type": "Manufacturer",
+    "relation": "supplies",
+    "tail": "Apple",
+    "tail_type": "Customer",
+    "confidence": 0.9,
+    "evidence": "TSMC supplies advanced chips to Apple, NVIDIA, and AMD",
+    "source": "supplier_profile_tsmc"
+  },
+  {
+    "head": "TSMC",
+    "head_type": "Manufacturer",
+    "relation": "supplies",
+    "tail": "NVIDIA",
+    "tail_type": "Customer",
+    "confidence": 0.9,
+    "evidence": "TSMC supplies advanced chips to Apple, NVIDIA, and AMD",
+    "source": "supplier_profile_tsmc"
+  },
+  {
+    "head": "TSMC",
+    "head_type": "Manufacturer",
+    "relation": "supplies",
+    "tail": "AMD",
+    "tail_type": "Customer",
+    "confidence": 0.9,
+    "evidence": "TSMC supplies advanced chips to Apple, NVIDIA, and AMD",
+    "source": "supplier_profile_tsmc"
+  },
+  {
+    "head": "TSMC",
+    "head_type": "Manufacturer",
+    "relation": "depends_on",
+    "tail": "ASML",
+    "tail_type": "Supplier",
+    "confidence": 0.9,
+    "evidence": "Taiwan Semiconductor Manufacturing depends on ASML for extreme ultraviolet lithography machines",
+    "source": "supplier_profile_tsmc"
+  },
+  {
+    "head": "TSMC",
+    "head_type": "Manufacturer",
+    "relation": "ships_through",
+    "tail": "Port of Kaohsiung",
+    "tail_type": "Port",
+    "confidence": 0.9,
+    "evidence": "TSMC ships through the Port of Kaohsiung to reach customers in the United States and Europe",
+    "source": "supplier_profile_tsmc"
+  },
+  {
+    "head": "ASML",
+    "head_type": "Supplier",
+    "relation": "located_in",
+    "tail": "Netherlands",
+    "tail_type": "Region",
+    "confidence": 0.9,
+    "evidence": "ASML is based in the Netherlands",
+    "source": "supplier_profile_tsmc"
+  },
+  {
+    "head": "TSMC",
+    "head_type": "Manufacturer",
+    "relation": "located_in",
+    "tail": "Taiwan",
+    "tail_type": "Region",
+    "confidence": 0.9,
+    "evidence": "TSMC, headquartered in Taiwan",
+    "source": "supplier_profile_tsmc"
+  },
+  {
+    "head": "TSMC",
+    "head_type": "Manufacturer",
+    "relation": "affected_by",
+    "tail": "Taiwan Earthquake",
+    "tail_type": "DisruptionEvent",
+    "confidence": 0.9,
+    "evidence": "TSMC was affected by the Taiwan Earthquake",
+    "source": "risk_report_taiwan_semiconductor"
+  },
+  {
+    "head": "GlobalFoundries",
+    "head_type": "Manufacturer",
+    "relation": "alternative_to",
+    "tail": "TSMC",
+    "tail_type": "Manufacturer",
+    "confidence": 0.9,
+    "evidence": "GlobalFoundries, headquartered in the United States, is an alternative to TSMC for mature-node chip production",
+    "source": "risk_report_taiwan_semiconductor"
+  },
+  {
+    "head": "Samsung Foundry",
+    "head_type": "Manufacturer",
+    "relation": "alternative_to",
+    "tail": "TSMC",
+    "tail_type": "Manufacturer",
+    "confidence": 0.9,
+    "evidence": "Samsung Foundry, located in South Korea, is also an alternative to TSMC for advanced logic chips",
+    "source": "risk_report_taiwan_semiconductor"
+  }
+]

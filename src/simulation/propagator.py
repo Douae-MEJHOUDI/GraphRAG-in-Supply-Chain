@@ -290,10 +290,12 @@ class DisruptionPropagator:
         """
         Build the complete list of initially disrupted nodes.
 
-        1. Start with event.ground_zero (explicit list).
+        1. Start with event.ground_zero — nodes must already be valid graph
+           node names (semantic resolution of unrecognised names is done
+           upstream by SimulationEngine before propagation starts).
         2. Collect location seeds (affected_region + Region-typed GZ nodes).
         3. Expand each seed to all co-located entities via reverse located_in.
-        4. Filter to nodes that exist in the graph.
+        4. Filter to nodes that exist in the graph; warn on any that don't.
         """
         gz_set: set[str] = set(event.ground_zero)
         location_seeds: set[str] = set()

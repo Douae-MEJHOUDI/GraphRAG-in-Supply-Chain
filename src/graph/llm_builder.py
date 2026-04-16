@@ -1,7 +1,7 @@
 """
 llm_builder.py
 --------------
-LLMGraphBuilder — production-quality, fully LLM-driven knowledge graph builder.
+LLMGraphBuilder — fully LLM-driven knowledge graph builder.
 
 Four improvements over the existing extractors (extract_triples_*.py):
 

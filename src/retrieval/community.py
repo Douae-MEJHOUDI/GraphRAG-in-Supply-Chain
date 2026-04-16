@@ -159,19 +159,23 @@ class CommunitySummarizer:
     def find_relevant_communities(
         self,
         query:   str,
-        top_k:   int = 3,
+        top_k:   int  = 3,
+        encoder       = None,   # optional NodeEncoder — enables semantic ranking
     ) -> list[Community]:
         """
         Return the top-K communities most relevant to a query string.
 
-        Uses simple keyword overlap between query tokens and community
-        summaries + node names. For a production system, replace this
-        with embedding similarity over summary vectors.
+        When an encoder is provided (recommended), ranks by cosine similarity
+        between the query embedding and each community's summary embedding.
+        Both vectors are already L2-normalised, so dot-product == cosine sim.
+
+        Falls back to keyword overlap only when encoder is not available.
 
         Parameters
         ----------
-        query : str   — natural language query
-        top_k : int   — number of communities to return
+        query   : str         — natural language query
+        top_k   : int         — number of communities to return
+        encoder : NodeEncoder — optional; uses FAISS-compatible BGE encoder
 
         Returns
         -------
@@ -180,16 +184,40 @@ class CommunitySummarizer:
         if not self.communities:
             return []
 
+        if encoder is not None:
+            return self._semantic_rank(query, top_k, encoder)
+
+        # Keyword fallback — only used when no encoder is available
         query_tokens = set(query.lower().split())
 
         def relevance_score(c: Community) -> float:
-            # Score = fraction of query tokens that appear in summary or node names
             text = (c.summary + " " + " ".join(c.nodes)).lower()
             hits = sum(1 for t in query_tokens if t in text)
             return hits / max(len(query_tokens), 1)
 
-        ranked = sorted(self.communities, key=relevance_score, reverse=True)
-        return ranked[:top_k]
+        return sorted(self.communities, key=relevance_score, reverse=True)[:top_k]
+
+    def _semantic_rank(
+        self, query: str, top_k: int, encoder
+    ) -> list[Community]:
+        """
+        Rank communities by cosine similarity between the query embedding
+        and each community's text (summary + top node names).
+        """
+        import numpy as np
+
+        query_emb = encoder.encode_query(query)   # (dim,), L2-normalised
+
+        scored: list[tuple[float, Community]] = []
+        for c in self.communities:
+            # Represent the community as: its summary + its most central node names
+            comm_text = c.summary + ". " + " ".join(c.nodes[:10])
+            comm_emb  = encoder.encode_query(comm_text)   # (dim,), L2-normalised
+            similarity = float(np.dot(query_emb, comm_emb))   # cosine similarity
+            scored.append((similarity, c))
+
+        scored.sort(key=lambda x: -x[0])
+        return [c for _, c in scored[:top_k]]
 
     def format_for_prompt(self, communities: list[Community]) -> str:
         """

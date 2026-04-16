@@ -1,0 +1,24 @@
+{
+  "nodes": 11,
+  "edges": 10,
+  "node_types": {
+    "Manufacturer": 3,
+    "Customer": 3,
+    "Supplier": 1,
+    "Port": 1,
+    "Region": 2,
+    "DisruptionEvent": 1
+  },
+  "relation_types": {
+    "supplies": 3,
+    "depends_on": 1,
+    "ships_through": 1,
+    "located_in": 2,
+    "affected_by": 1,
+    "alternative_to": 2
+  },
+  "avg_degree": 1.82,
+  "weakly_connected_components": 1,
+  "model": "qwen2.5:32b",
+  "backend": "ollama"
+}

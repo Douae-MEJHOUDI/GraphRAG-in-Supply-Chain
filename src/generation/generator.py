@@ -3,7 +3,7 @@ generator.py
 ------------
 RiskReportGenerator — the LLM generation layer for Module 4.
 
-Primary backend — Anthropic Claude (slide 16: "Claude Sonnet 4.6")
+Primary backend — Anthropic Claude ("Claude Sonnet 4.6")
   Requires: pip install anthropic
   Requires: ANTHROPIC_API_KEY environment variable
   Model: claude-sonnet-4-6
@@ -146,39 +146,65 @@ class RiskReport:
 
 
 # ---------------------------------------------------------------------------
-# Prompt builder suffix
+# System prompt — defines Claude's role and the exact output format.
+# Keeping format instructions here (not in the user message) means the
+# user message stays clean: just context + question.
 # ---------------------------------------------------------------------------
 
-STRUCTURED_PROMPT_SUFFIX = """
+SYSTEM_PROMPT = """You are a senior supply chain risk analyst specialising in \
+global electronics, semiconductors, energy, and critical minerals.
 
-Please structure your response using these exact XML tags so it can be parsed:
+You will be given a structured knowledge graph context produced by a disruption \
+simulation engine. It contains:
+- Nodes scored by disruption exposure (0–1 scale, CRITICAL ≥ 0.80)
+- Dependency chains showing how the shock propagates hop by hop
+- Edge criticality flags for single-source dependencies with no alternatives
+- GraphRAG retrieval relevance scores
 
-<critical_entities>
-List the top 5 most critically exposed entities with their disruption scores.
-One entity per line. Include the dependency path that creates the exposure.
-</critical_entities>
+Your task: produce a structured impact report answering the user's what-if question.
 
-<dependency_chains>
-For each critical entity, describe the full dependency chain from the
-disruption source to that entity. Use arrow notation: A → B → C.
-</dependency_chains>
+Rules:
+1. Base every claim on the graph context. If data is absent for a point, write \
+"Data not available in graph."
+2. Name specific companies, countries, and products — never say "some companies" \
+when you have names.
+3. Express cascade effects as dependency chains using arrow notation: A → B → C → impact.
+4. Use disruption scores to calibrate severity: CRITICAL (≥0.80), HIGH (≥0.50), \
+MODERATE (≥0.25), LOW (<0.25).
+5. Flag any edge marked CRITICAL (single-source, no alternative) — these are the \
+highest-priority mitigations.
+6. Be concise but complete. Each section: 3–6 bullet points.
 
-<critical_edges>
-List all CRITICAL single-source dependency edges (marked *** CRITICAL in the
-context). Explain why each is dangerous and what makes it irreplaceable.
-</critical_edges>
+Output format — use exactly these markdown section headers:
 
-<mitigations>
-Provide 3 concrete, actionable mitigation recommendations grounded in the
-graph structure. Reference specific alternative suppliers or routes from
-the context where available.
-</mitigations>
+## Executive Summary
+[2–3 sentence overview: what happened, scale of impact, who is most exposed]
 
-<resilience_assessment>
-One paragraph assessing the overall supply chain resilience for this event.
-Include a qualitative risk rating: LOW / MODERATE / HIGH / CRITICAL.
-</resilience_assessment>
-"""
+## Critically Exposed Entities
+[Bullet list — entity name, disruption score, severity tier, entity type]
+
+## Cascade & Dependency Chains
+[Bullet list — show full propagation path using A → B → C notation]
+
+## Single-Source Critical Dependencies
+[Only edges flagged CRITICAL in context — what is at risk and why it is irreplaceable]
+
+## Mitigation Recommendations
+[3–5 concrete, actionable recommendations grounded in the graph structure]
+
+## Supply Chain Resilience Assessment
+[Overall verdict: LOW / MODERATE / HIGH / CRITICAL risk rating with justification]"""
+
+
+def _build_user_message(enriched_context: str, query: str) -> str:
+    """Build the user-facing message: graph context + question, no format instructions."""
+    return (
+        f"Knowledge graph context:\n\n"
+        f"{enriched_context}\n\n"
+        f"---\n\n"
+        f"User question: {query}\n\n"
+        f"Generate the impact report following the format in your instructions."
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -190,7 +216,7 @@ class RiskReportGenerator:
     Generates structured risk reports using Claude Sonnet 4.6 (primary)
     or OpenAI / Ollama (secondary).
 
-    Usage — Anthropic (default, matches slide 16):
+    Usage — Anthropic (default):
     >>> gen = RiskReportGenerator()          # backend="anthropic" by default
     >>> report = gen.generate(sim_result)
     >>> print(report.display())
@@ -221,6 +247,8 @@ class RiskReportGenerator:
         self.max_tokens  = max_tokens
         self.temperature = temperature
 
+        self._client = None   # cached backend client (Anthropic or OpenAI)
+
         if self.backend == LLMBackend.ANTHROPIC:
             self._validate_anthropic()
         elif self.backend == LLMBackend.OPENAI:
@@ -235,14 +263,20 @@ class RiskReportGenerator:
     def generate(self, sim_result: SimulationResult) -> RiskReport:
         """
         Generate a structured risk report from a SimulationResult.
-        Uses Claude Sonnet 4.6 by default (slide 16).
+        Uses Claude Sonnet 4.6 by default.
+
+        The format instructions live in SYSTEM_PROMPT; the user message
+        contains only the enriched graph context + the question.
         """
-        full_prompt = sim_result.risk_report_prompt + STRUCTURED_PROMPT_SUFFIX
+        user_message = _build_user_message(
+            enriched_context=sim_result.enriched_context,
+            query=sim_result.graphrag_result.query,
+        )
 
         print(f"[Generator] Calling {self.model} ({self.backend.value})...")
         t0 = time.time()
 
-        raw_text, tokens = self._dispatch(full_prompt)
+        raw_text, tokens = self._dispatch(user_message)
 
         elapsed = time.time() - t0
         print(f"[Generator] Done in {elapsed:.1f}s  ({tokens} tokens)")
@@ -293,7 +327,7 @@ class RiskReportGenerator:
 
     def _validate_anthropic(self) -> None:
         try:
-            import anthropic  # noqa: F401
+            import anthropic
         except ImportError:
             raise ImportError(
                 "anthropic package not installed. Run: pip install anthropic"
@@ -303,21 +337,15 @@ class RiskReportGenerator:
                 "ANTHROPIC_API_KEY environment variable not set.\n"
                 "Set it with: export ANTHROPIC_API_KEY='sk-ant-...'"
             )
+        self._client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
 
     def _call_anthropic(self, prompt: str) -> tuple[str, int]:
         """Call the Anthropic Messages API and return (text, total_tokens)."""
-        import anthropic
-
-        client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+        client = self._client
         message = client.messages.create(
             model=self.model,
             max_tokens=self.max_tokens,
-            system=(
-                "You are a senior supply chain risk analyst. "
-                "You reason carefully from graph-structured evidence "
-                "and always cite specific entity names and dependency "
-                "paths in your analysis."
-            ),
+            system=SYSTEM_PROMPT,
             messages=[{"role": "user", "content": prompt}],
         )
 
@@ -332,22 +360,19 @@ class RiskReportGenerator:
 
     def _validate_openai(self) -> None:
         try:
-            import openai  # noqa: F401
+            import openai
         except ImportError:
             raise ImportError("openai package not installed. Run: pip install openai")
         if not os.environ.get("OPENAI_API_KEY"):
             raise EnvironmentError("OPENAI_API_KEY environment variable not set.")
+        self._client = openai.OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
     def _call_openai(self, prompt: str) -> tuple[str, int]:
-        import openai
-        client   = openai.OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+        client   = self._client
         response = client.chat.completions.create(
             model=self.model,
             messages=[
-                {"role": "system", "content": (
-                    "You are a senior supply chain risk analyst. "
-                    "You reason carefully from graph-structured evidence."
-                )},
+                {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": prompt},
             ],
             max_tokens=self.max_tokens,
@@ -422,19 +447,27 @@ class RiskReportGenerator:
         tokens:     int,
         elapsed:    float,
     ) -> RiskReport:
-        def extract_tag(text: str, tag: str) -> str:
-            match = re.search(rf"<{tag}>(.*?)</{tag}>", text, re.DOTALL | re.IGNORECASE)
+        """
+        Extract individual markdown sections from Claude's response.
+
+        Sections are delimited by ## headers matching SYSTEM_PROMPT's format.
+        Everything between two consecutive ## headers belongs to the first one.
+        """
+        def extract_section(text: str, header: str) -> str:
+            # Match from the header to the next ## header (or end of string)
+            pattern = rf"##\s*{re.escape(header)}\s*\n(.*?)(?=\n##\s|\Z)"
+            match = re.search(pattern, text, re.DOTALL | re.IGNORECASE)
             return match.group(1).strip() if match else ""
 
         return RiskReport(
             event_name=event_name,
             query=query,
             full_text=raw_text,
-            critical_entities=extract_tag(raw_text, "critical_entities"),
-            dependency_chains=extract_tag(raw_text, "dependency_chains"),
-            critical_edges=extract_tag(raw_text, "critical_edges"),
-            mitigations=extract_tag(raw_text, "mitigations"),
-            resilience_assessment=extract_tag(raw_text, "resilience_assessment"),
+            critical_entities=extract_section(raw_text, "Critically Exposed Entities"),
+            dependency_chains=extract_section(raw_text, "Cascade & Dependency Chains"),
+            critical_edges=extract_section(raw_text, "Single-Source Critical Dependencies"),
+            mitigations=extract_section(raw_text, "Mitigation Recommendations"),
+            resilience_assessment=extract_section(raw_text, "Supply Chain Resilience Assessment"),
             model=self.model,
             backend=self.backend.value,
             generation_time_s=elapsed,

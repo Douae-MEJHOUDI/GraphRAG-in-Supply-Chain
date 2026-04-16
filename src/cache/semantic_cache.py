@@ -44,8 +44,9 @@ import faiss
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
-from src.simulation.engine import SimulationEngine, SimulationResult
-from src.simulation.events import DisruptionEvent
+from src.simulation.engine      import SimulationEngine, SimulationResult
+from src.simulation.events      import DisruptionEvent
+from src.generation.generator   import RiskReportGenerator
 
 
 # ---------------------------------------------------------------------------
@@ -207,17 +208,26 @@ class CachedPipeline:
     On every call to run():
       1. Check the SemanticCache for a similar previous query.
       2. On hit  → return the cached report as a dict (no LLM call).
-      3. On miss → run the full SimulationEngine pipeline, store result.
+      3. On miss → run the full SimulationEngine pipeline,
+                   call RiskReportGenerator to get Claude's structured report,
+                   store result in cache.
 
     Parameters
     ----------
     engine     : a fully configured SimulationEngine instance
     cache      : a SemanticCache instance (shared or dedicated)
+    generator  : a RiskReportGenerator instance (calls Claude)
     """
 
-    def __init__(self, engine: SimulationEngine, cache: SemanticCache):
-        self.engine = engine
-        self.cache  = cache
+    def __init__(
+        self,
+        engine:    SimulationEngine,
+        cache:     SemanticCache,
+        generator: RiskReportGenerator,
+    ):
+        self.engine    = engine
+        self.cache     = cache
+        self.generator = generator
 
     def run(
         self,
@@ -255,18 +265,28 @@ class CachedPipeline:
         print(f"[CachedPipeline] Cache miss — running full pipeline for: {query!r}")
         result: SimulationResult = self.engine.run(event=event, query=query)
 
-        # Serialise result to a plain dict (same structure as SimulationResult.save())
+        # Call Claude to generate the structured risk report
+        report = self.generator.generate(result)
+
         payload = {
-            "event_name":     result.event.name,
-            "event_category": result.event.category.value,
-            "initial_shock":  result.event.initial_shock,
-            "stats":          result.propagation.stats,
-            "top_10_exposed": result.propagation.top_n(10),
-            "critical_nodes": result.propagation.critical_nodes(),
-            "high_nodes":     result.propagation.high_nodes(),
-            "tiers":          result.propagation.tiers,
-            "merged_scores":  result.merged_scores,
-            "risk_report":    result.risk_report_prompt,
+            "event_name":            result.event.name,
+            "event_category":        result.event.category.value,
+            "initial_shock":         result.event.initial_shock,
+            "stats":                 result.propagation.stats,
+            "top_10_exposed":        result.propagation.top_n(10),
+            "critical_nodes":        result.propagation.critical_nodes(),
+            "high_nodes":            result.propagation.high_nodes(),
+            "tiers":                 result.propagation.tiers,
+            "merged_scores":         result.merged_scores,
+            # Structured sections parsed from Claude's response
+            "risk_report":           report.full_text,
+            "critical_entities":     report.critical_entities,
+            "dependency_chains":     report.dependency_chains,
+            "critical_edges":        report.critical_edges,
+            "mitigations":           report.mitigations,
+            "resilience_assessment": report.resilience_assessment,
+            "model":                 report.model,
+            "generation_time_s":     report.generation_time_s,
         }
 
         # Store in cache
