@@ -180,16 +180,7 @@ GraphRAG-in-Supply-Chain/
 │   └── utils/
 │       └── visualization.py             ← Graph rendering (matplotlib + pyvis)
 │
-├── different_approach_for_benchmark/    ← Classical RAG baseline (no graph)
-│   ├── m1_data_collection/              ← SEC, USGS, iFixit, GDELT connectors
-│   ├── m2_data_processing/              ← Per-source text processors
-│   ├── m3_entity_resolution/           ← String + embedding alias resolution
-│   ├── m4_graph_construction/          ← Flat document store (no graph reasoning)
-│   ├── m6_rag_retrieval/               ← Vector-only retrieval pipeline
-│   ├── m7_report_generation/           ← Same LLM, no graph context
-│   ├── m8_api/                          ← FastAPI backend for benchmark
-│   ├── m9_ui/                           ← Frontend UI
-│   └── m_eval/                          ← Shared evaluation + benchmark harness
+├── different_approach_for_benchmark/   
 │
 ├── data/
 │   ├── raw/                             ← Source documents
@@ -199,7 +190,7 @@ GraphRAG-in-Supply-Chain/
 │       ├── communities.json             ← Pre-computed Louvain communities
 │       └── cache/                       ← Semantic query cache
 │
-├── notebooks/                           ← One notebook per module
+├── notebooks/                           ← One notebook per module (were used for developpement)
 │
 └── requirements.txt
 ```
@@ -338,10 +329,6 @@ The benchmark serves one purpose: demonstrate that graph structure, not just dat
 
 | Dataset | Description |
 |---------|-------------|
-| **SEC EDGAR** | 10-K / 20-F filings — supplier relationships, geographic concentrations, risk factors |
-| **USGS Mineral Commodity Summaries 2024** | Country-level mineral production and reserve data |
-| **iFixit Teardown Guides** | Product-level component and supplier dependencies |
-| **GDELT Project** | Global geopolitical event database with Goldstein conflict scale scores |
 | **S&P 500 corpus** | Filtered supply chain passages used to build the production Qwen-extracted graph |
 
 ---
