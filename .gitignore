@@ -1,54 +1,95 @@
-# ── API keys — never commit these ──────────────────────────────────────────
+# Secrets and environment files (API keys, tokens, local creds)
 .env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+*.env
+*.local
+*.secret
+*.secrets
+secrets.*
+credentials.*
+*credentials*.json
+*secret*.json
+*secrets*.json
+*token*.json
+*service-account*.json
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+*.jks
 
-# ── Generated graph data (large, rebuilt with python -m src.ingest) ────────
-graph_storage/
-
-# ── Python cache ────────────────────────────────────────────────────────────
+# Python cache/build
 __pycache__/
 *.py[cod]
 *.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+*.egg-info/
+build/
+dist/
 
-# ── Virtual environments ─────────────────────────────────────────────────────
+# Virtual environments
 .venv/
 venv/
 env/
 ENV/
 
-# ── Jupyter ──────────────────────────────────────────────────────────────────
+# Jupyter
 .ipynb_checkpoints/
 
-# ── OS files ─────────────────────────────────────────────────────────────────
+# OS / IDE
 .DS_Store
 Thumbs.db
-
-# ── IDE files ─────────────────────────────────────────────────────────────────
 .vscode/
 .idea/
 .claude/
+.codex/
 
-# ── Reference / planning documents (not part of submission code) ─────────────
-*.pdf
-guides.txt
-
-# ── Misc ─────────────────────────────────────────────────────────────────────
+# Logs and runtime artifacts
 *.log
+*.pid
+*.out
+*.err
 
-# ── Local large data ─────────────────────────────────────────────────────────
+# Generated project artifacts and local data
+graph_storage/
+outputs/
+notebooks/outputs/
 data/Edgar/
 data/sp500/
 data/interim/
-data/raw/*.jsonl
-data/raw/*.parquet
+data/raw/
+data/processed/
+data/cache/
 
-# My Branch LOL
-.codex
+# Keep lightweight docs/eval fixtures under data/
+!data/README.md
+!data/GRAPH_RAG_RULES.md
+!data/plan_for_data.md
+!data/eval/
+!data/eval/**
 
+# Model/index artifacts (if created outside ignored folders)
+*.gpickle
+*.faiss
+*.bin
+*.bin.names
+*.pkl
+*.progress.jsonl
+
+# Local scratch folders
 OLD/
-# Secondary folder
 files/
 
-data/Edgar/
-data/sp500/
-data/raw/*.jsonl
-data/raw/*.parquet
+# Reference/planning docs not needed in repo history
+*.pdf
+guides.txt
