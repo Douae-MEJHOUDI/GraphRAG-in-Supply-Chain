@@ -91,5 +91,5 @@ OLD/
 files/
 
 # Reference/planning docs not needed in repo history
-*.pdf
+#*.pdf
 guides.txt
